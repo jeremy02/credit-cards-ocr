@@ -24,8 +24,8 @@
                     <input @change="handleImageSelect($event)" class="custom-input my-4" 
                         type="file" block accept="image/x-png,image/gif,image/jpeg,image/jpg">
 
-                    <v-btn @click.native="detectTextFromImage" block class="red">
-                        <v-icon left>camera_alt</v-icon> Scan
+                    <v-btn @click.native="detectTextFromImage" block class="red" :disabled="!selectedImageBase64">
+                        <v-icon left>camera_alt</v-icon> Detect Text
                     </v-btn>
 
                 </v-flex>
