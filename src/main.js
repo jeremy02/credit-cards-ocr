@@ -3,6 +3,8 @@ import Vuetify from 'vuetify'
 import router from './router'
 import store from './store'
 
+require('../node_modules/vuetify/dist/vuetify.min.css')
+
 const App = () => import('./App');
 
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
@@ -18,8 +20,6 @@ Vue.use(Vuetify)
 // Vue.use(BootstrapVue)
 // // Optionally install the BootstrapVue icon components plugin
 // Vue.use(IconsPlugin)
-
-require('../node_modules/vuetify/dist/vuetify.min.css')
 
 Vue.config.productionTip = false
 

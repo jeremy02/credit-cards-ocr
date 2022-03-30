@@ -1,44 +1,46 @@
 import axios from 'axios'
+import detectTextApi from '../../api/detectTextAPI'
+import detectTextRequestBody from '../../api/models/detectTextModel'
 
 let initialMessage = {
-      success: false,
-      message: null,
+    success: false,
+    message: null,
 };
 
 const state = { 
-    users: [],
     selectedImage: null,
     selectedImageBase64: null,
     messageResult: {
       success: false,
       message: null,
-    },
-    initialMessage: initialMessage
+    }
 };
 
 const getters = {
-    usersList: state => state.users,
     selectedImage: state => state.selectedImage,
     selectedImageBase64: state => state.selectedImageBase64,
     messageResult: state => state.messageResult
 };
 
-const actions = { 
-    async fetchUsers({commit}){
-      const response = await axios.get("http://localhost:3000/users");
-      commit("setUsers", response.data)
-    },
-    async addUsers({commit}, user){
-      const response = await axios.post("http://localhost:3000/users", user);
-      commit("addNewUser", response.data)
-    },
-    async deleteUser({commit}, id){
-      await axios.delete(`http://localhost:3000/users/${id}`);
-      commit("removeUser", id)
+const actions = {
+    async detectTextFromImage({commit}){
+        // init the message to return
+        let msg = initialMessage;
+        
+        // Check if we have an image to detect text
+        if(!state.selectedImageBase64) {
+            msg.message = "No file was found to detect text operation";
+        }    
+
+        // OCR/Google Vision Deetxt Text Request body 
+        let detextTextData = detectTextRequestBody
+        
+        const response = await detectTextApi.detectTextFromImage(detextTextData)
+        console.log(JSON.stringify(response));
     },
     async handleImageSelect({commit}, event){
       // init the message to return
-      let msg = state.initialMessage;
+      let msg = initialMessage;
        
       // Check if there is a file
       if(!event.target.files) {
@@ -65,14 +67,6 @@ const actions = {
 };
 
 const mutations = { 
-    setUsers: (state, users) => (
-        state.users = users
-    ),
-    addNewUser: (state, user) => state.users.unshift(user),
-    removeUser: (state, id) => (
-        state.users.filter(user => user.id !== id),
-        state.users.splice(user => user.id, 1)
-    ),
     addMessage: (state, data) => (
         state.messageResult = data
     ),

@@ -24,7 +24,7 @@
                     <input @change="handleImageSelect($event)" class="custom-input my-4" 
                         type="file" block accept="image/x-png,image/gif,image/jpeg,image/jpg">
 
-                    <v-btn @click.native="process" block class="red">
+                    <v-btn @click.native="detectTextFromImage" block class="red">
                         <v-icon left>camera_alt</v-icon> Scan
                     </v-btn>
 
@@ -148,7 +148,7 @@ export default {
     }),
 
     methods: {
-        ...mapActions(["handleImageSelect", "deleteUser"]),
+        ...mapActions(["handleImageSelect", "detectTextFromImage"]),
         handleImage: function(e) {
             const selectedImage = e.target.files[0]; // get first file
             this.createBase64Image(selectedImage);
@@ -220,7 +220,7 @@ export default {
                 return str.substring(2, 4);
             }
         },
-    }
+    },
 }
 </script>
 
