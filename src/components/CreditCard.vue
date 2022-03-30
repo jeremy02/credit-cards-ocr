@@ -7,11 +7,11 @@
                 <!--The Image-->
                 <v-flex xs12 sm12 md6 lg6 xl6>
                 
-                    <v-card  class="py-2 px-2 mb-2" 
+                    <v-card  class="pa-2 mb-2" 
                     :class="[
                         messageResult.success ? 'green' : 'red',
                     ]" v-if="messageResult.message"> 
-                        <span class="text-white text-">
+                        <span class="text-white">
                             {{ messageResult.message }}
                         </span>
                     </v-card>

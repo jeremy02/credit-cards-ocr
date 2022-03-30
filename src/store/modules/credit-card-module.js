@@ -26,19 +26,32 @@ const actions = {
     async detectTextFromImage({commit}){
         // init the message to return
         let msg = initialMessage;
-        
+
         // Check if we have an image to detect text
         if(!state.selectedImageBase64) {
             msg.message = "No file was found to detect text operation";
-        }    
-
-        // OCR/Google Vision Deetxt Text Request body 
-        let detextTextData = detectTextRequestBody
-        
-        const response = await detectTextApi.detectTextFromImage(detextTextData)
-        console.log(JSON.stringify(response));
+            await commit("addMessage", msg)
+        }else{
+            // OCR/Google Vision Deetxt Text Request body 
+            let detextTextData = detectTextRequestBody.detectTextRequestBody   
+            
+            try {
+                const response = await detectTextApi.detectTextFromImage(detextTextData)
+            } catch (error) {
+                if(error.response.data.error.message) {
+                    msg.message = error.response.data.error.message
+                    await commit("addMessage", msg)
+                }else{
+                    msg.message = error.message
+                    await commit("addMessage", msg)
+                }
+            }
+        }
     },
     async handleImageSelect({commit}, event){
+        // reset the data and fields 
+        commit("resetData")
+
       // init the message to return
       let msg = initialMessage;
        
@@ -80,6 +93,13 @@ const mutations = {
             state.selectedImageBase64 = e.target.result;
         };
         reader.readAsDataURL(fileObject);
+    },
+    resetData: function() {
+        // reset the data
+        state.selectedImage = null;
+        state.selectedImageBase64 = null;
+        state.messageResult = initialMessage;
+
     }
 };
 
