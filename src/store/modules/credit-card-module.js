@@ -31,30 +31,31 @@ const actions = {
         // reset the data and fields 
         commit("resetData")
 
-      // init the message to return
-      let msg = initialMessage;
-       
-      // Check if there is a file
-      if(!event.target.files) {
-          msg.message = "No file was found to perform operation";
-      }
-      
-      // should not allow upload of more than one file 
-      if(event.target.files.length < 1) {
-          msg.message = "Please upload an image/file to perform operation";
-      }
+        // init the message to return
+        let msg = initialMessage;
+        
+        // Check if there is a file
+        if(!event.target.files) {
+            msg.message = "No file was found to perform operation";
+        }
+        
+        // Check if there was a file object
+        if(event.target.files.length < 1) {
+            msg.message = "Please upload an image/file to perform operation";
+        }
 
-      if(event.target.files.length > 1) {
-          msg.message = "Only one file or image allowed to perform operation";
-      }
-      
-      // if we have a message
-      if(msg.message) {
-          commit("addMessage", msg)
-      }else{
-          // add the image to store
-          await commit("setSelectedImage", event.target.files[0])  // get first file
-      }
+        // should not allow upload of more than one file 
+        if(event.target.files.length > 1) {
+            msg.message = "Only one file or image allowed to perform operation";
+        }
+        
+        // if we have a message
+        if(msg.message) {
+            commit("addMessage", msg)
+        }else{
+            // add the image to store
+            await commit("setSelectedImage", event.target.files[0])  // get first file
+        }
     },
     async detectTextFromImage({commit}){
         // init the message to return
@@ -75,8 +76,44 @@ const actions = {
                 detextTextData.requests[0].image.content = base64Image;
 
                 const response = await detectTextApi.detectTextFromImage(detextTextData)
-                
-                commit("detectTextResponse", response.data)
+
+                // get the first index response
+                const detectedTextResponse = response.data .responses[0];
+
+                // we have all the descriptions from textAnnotations
+                const annotationResult = detectedTextResponse.textAnnotations;
+
+                // annotationResult.forEach(text => console.log(text))
+
+                // this is the text annotation
+                let textAnnotationsDesc= annotationResult[0].description ? annotationResult[0].description : null;
+
+                // this is the full text annotation
+                let fullTextAnnotationsDesc = detectedTextResponse.fullTextAnnotation.text ? detectedTextResponse.fullTextAnnotation.text : null;
+
+                //  do we have text that was detected    
+                if(!textAnnotationsDesc && !fullTextAnnotationsDesc) {
+                    // init the message to return
+                    msg.message = "No text was detected from the image";
+                    commit("addMessage", msg)
+                }else{
+                    // set the responses
+                    commit("setDetectTextDescResponse", textAnnotationsDesc)
+                    commit("setDetectTextFullDescResponse", fullTextAnnotationsDesc)
+
+                    // just do operations on one of the above results
+                    // format the text to extract details
+                    if(fullTextAnnotationsDesc) {
+                       this.dispatch('formatDetectedText', fullTextAnnotationsDesc.replace(/\r\n/g, "\r").replace(/\n/g, "\r").split(/\r/));
+                    }else{
+                        if(textAnnotationsDesc) {
+                            this.dispatch('formatDetectedText', textAnnotationsDesc.replace(/\r\n/g, "\r").replace(/\n/g, "\r").split(/\r/));
+                        }else{
+                            msg.message = "No text was detected from the image to perform operation";
+                            commit("addMessage", msg)
+                        }
+                    }             
+                }  
             } catch (error) {
                 if(error.response.data.error.message) {
                     msg.message = error.response.data.error.message
@@ -105,12 +142,12 @@ const mutations = {
     ),
     setSelectedImage: function(state, fileObject) {
         // set the image
-        state.selectedImage = fileObject;
+        state.selectedImage = fileObject
 
         // create Base64 Image
-        const reader = new FileReader();
+        const reader = new FileReader()
         reader.onload = (e) => {
-            state.selectedImageBase64 = e.target.result;
+            state.selectedImageBase64 = e.target.result
         };
         reader.readAsDataURL(fileObject);
     },
@@ -120,37 +157,12 @@ const mutations = {
         state.selectedImageBase64 = null;
         state.messageResult = initialMessage
     },
-    detectTextResponse: function(state, result) {
-        const detectedTextResponse = result.responses[0];
-
-        // we have all the descriptions from textAnnotations
-        const annotationResult = detectedTextResponse.textAnnotations;
-
-        // annotationResult.forEach(text => console.log(text))
-
-        // this is the text annotation
-        let textAnnotationsDesc= annotationResult[0].description ? annotationResult[0].description : null;
-
-        // this is the full text annotation
-        let fullTextAnnotationsDesc = detectedTextResponse.fullTextAnnotation.text ? detectedTextResponse.fullTextAnnotation.text : null;
-
-        console.log(fullTextAnnotationsDesc.replace(/\r\n/g, "\r").replace(/\n/g, "\r").split(/\r/))
-
-        
-        //  do we have text    
-        if(!textAnnotationsDesc && !fullTextAnnotationsDesc) {
-            // init the message to return
-            let msg = initialMessage;
-            msg.message = "No text was detected from the image";
-            commit("addMessage", msg)
-        }else{
-            state.textAnnotationsDesc = textAnnotationsDesc
-            state.fullTextAnnotationsDesc = fullTextAnnotationsDesc
-
-            // format the text to extract details
-            this.dispatch('formatDetectedText', fullTextAnnotationsDesc.replace(/\r\n/g, "\r").replace(/\n/g, "\r").split(/\r/));
-        }        
-    }    
+    setDetectTextDescResponse: function(state, textAnnotationsDesc) {
+        state.textAnnotationsDesc = textAnnotationsDesc
+    },
+    setDetectTextFullDescResponse: function(state, fullTextAnnotationsDesc) {
+        state.fullTextAnnotationsDesc = fullTextAnnotationsDesc
+    }
 };
 
 export default {

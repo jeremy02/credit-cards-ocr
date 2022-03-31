@@ -361,6 +361,13 @@
     "follow-redirects" "^1.2.3"
     "is-buffer" "^1.1.5"
 
+"axios@^0.26.1":
+  "integrity" "sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA=="
+  "resolved" "https://registry.npmjs.org/axios/-/axios-0.26.1.tgz"
+  "version" "0.26.1"
+  dependencies:
+    "follow-redirects" "^1.14.8"
+
 "babel-code-frame@^6.11.0", "babel-code-frame@^6.22.0":
   "integrity" "sha1-AnYgvuVnqIwyVhV05/0IAdMxGOQ="
   "resolved" "https://registry.npmjs.org/babel-code-frame/-/babel-code-frame-6.22.0.tgz"
@@ -1665,6 +1672,13 @@
     "safe-buffer" "^5.0.1"
     "sha.js" "^2.4.8"
 
+"credit-cards-detect-text@^1.0.27":
+  "integrity" "sha512-/W1JltPEi0OPiBfVJBpqEk5xsgvVeHY4InH25K3v3b1Wzdr4wEYEubPP1vooU2/JxSKV8cU7F7ZbUGtM6xlv2w=="
+  "resolved" "https://registry.npmjs.org/credit-cards-detect-text/-/credit-cards-detect-text-1.0.27.tgz"
+  "version" "1.0.27"
+  dependencies:
+    "axios" "^0.26.1"
+
 "crypto-browserify@^3.11.0":
   "integrity" "sha512-Na7ZlwCOqoaW5RwUK1WpXws2kv8mNhWdTlzob0UXulk6G9BDbyiJaGTYBIX61Ozn9l1EPPJpICZb4DaOpT9NlQ=="
   "resolved" "https://registry.npmjs.org/crypto-browserify/-/crypto-browserify-3.11.1.tgz"
@@ -1798,7 +1812,7 @@
   "resolved" "https://registry.npmjs.org/de-indent/-/de-indent-1.0.2.tgz"
   "version" "1.0.2"
 
-"debug@^2.1.1", "debug@^2.2.0", "debug@^2.4.5":
+"debug@^2.1.1", "debug@^2.2.0":
   "integrity" "sha1-5zFTHKLt4n0YgiJCfaF4IdaP9Pw="
   "resolved" "https://registry.npmjs.org/debug/-/debug-2.6.8.tgz"
   "version" "2.6.8"
@@ -2316,12 +2330,10 @@
   "resolved" "https://registry.npmjs.org/flatten/-/flatten-1.0.2.tgz"
   "version" "1.0.2"
 
-"follow-redirects@^1.2.3":
-  "integrity" "sha512-Suw6KewLV2hReSyEOeql+UUkBVyiBm3ok1VPrVFRZnQInWpdoZbbiG5i8aJVSjTr0yQ4Ava0Sh6/joCg1Brdqw=="
-  "resolved" "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.2.4.tgz"
-  "version" "1.2.4"
-  dependencies:
-    "debug" "^2.4.5"
+"follow-redirects@^1.14.8", "follow-redirects@^1.2.3":
+  "integrity" "sha512-MQDfihBQYMcyy5dhRDJUHcw7lb2Pv/TuE6xP1vyraLukNDHKbDxDNaOE3NbCAdKQApno+GPRyo1YAp89yCjK4w=="
+  "resolved" "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.14.9.tgz"
+  "version" "1.14.9"
 
 "for-in@^1.0.1":
   "integrity" "sha1-gQaNKVqBQuwKxybG4iAMMPttXoA="

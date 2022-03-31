@@ -52,10 +52,6 @@
 </template>
 
 <script>
-import $ from "jquery";
-
-import axios from 'axios';
-
 import {mapGetters, mapActions} from "vuex";
 
 export default {
@@ -63,22 +59,22 @@ export default {
     data: function() {
         return{
             loader: false,
-            result: false
+            result: false,
         }
     },
-
+    
     computed: {
         ...mapGetters({
+            messageResult: 'messageResult',
             selectedImage: 'selectedImage',
             selectedImageBase64: 'selectedImageBase64',
-            messageResult: 'messageResult',
             textAnnotationsDesc: 'textAnnotationsDesc',
             fullTextAnnotationsDesc: 'fullTextAnnotationsDesc',
         }),
     },
 
     methods: {
-        ...mapActions(["handleImageSelect", "detectTextFromImage"]),     
+        ...mapActions(["handleImageSelect", "detectTextFromImage"]),
     },
 }
 </script>
