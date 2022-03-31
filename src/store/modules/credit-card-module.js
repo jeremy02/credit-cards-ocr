@@ -65,7 +65,7 @@ const actions = {
             msg.message = "No file was found to detect text operation";
             await commit("addMessage", msg)
         }else{
-            // OCR/Google Vision Deetxt Text Request body 
+            // OCR Google Vision Deetxt Text Request body 
             let detextTextData = detectTextRequestBody.detectTextRequestBody   
             
             try {
@@ -89,6 +89,14 @@ const actions = {
             }
         }
     },
+    formatDetectedText({ dispatch, commit }, detectedText) {
+        console.log(detectedText)
+
+        // loop through the detected text
+        detectedText.forEach( (element) => {
+            console.log(">>>>>>>>>>>>>>>:::"+element)
+        })
+    }
 };
 
 const mutations = { 
@@ -121,18 +129,28 @@ const mutations = {
         // annotationResult.forEach(text => console.log(text))
 
         // this is the text annotation
-        state.textAnnotationsDesc = annotationResult[0].description ? annotationResult[0].description : null
+        let textAnnotationsDesc= annotationResult[0].description ? annotationResult[0].description : null;
 
         // this is the full text annotation
-        state.fullTextAnnotationsDesc = detectedTextResponse.fullTextAnnotation.text ? detectedTextResponse.fullTextAnnotation.text : null
+        let fullTextAnnotationsDesc = detectedTextResponse.fullTextAnnotation.text ? detectedTextResponse.fullTextAnnotation.text : null;
 
-        // state.fullTextAnnotationsDesc = vm.fullTextAnnotation.replace(/\r\n/g, "\r").replace(/\n/g, "\r").split(/\r/);
+        console.log(fullTextAnnotationsDesc.replace(/\r\n/g, "\r").replace(/\n/g, "\r").split(/\r/))
 
-        console.log(">>>>>>>>>>>>>1>>>>"+JSON.stringify(state.textAnnotationsDesc))
-        console.log(">>>>>>>>>>>>>2>>>>"+JSON.stringify(state.fullTextAnnotationsDesc))
+        
+        //  do we have text    
+        if(!textAnnotationsDesc && !fullTextAnnotationsDesc) {
+            // init the message to return
+            let msg = initialMessage;
+            msg.message = "No text was detected from the image";
+            commit("addMessage", msg)
+        }else{
+            state.textAnnotationsDesc = textAnnotationsDesc
+            state.fullTextAnnotationsDesc = fullTextAnnotationsDesc
 
-    }
-    
+            // format the text to extract details
+            this.dispatch('formatDetectedText', fullTextAnnotationsDesc.replace(/\r\n/g, "\r").replace(/\n/g, "\r").split(/\r/));
+        }        
+    }    
 };
 
 export default {
