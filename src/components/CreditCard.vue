@@ -63,45 +63,12 @@ export default {
     data: function() {
         return{
             loader: false,
-            result: false,
-            myImage: "",
-            apiKey: "AIzaSyAuX0eP9CBzbkfqrVtCC0gPL4BiUm_EUUo",  //google cloud api  Browser key 
-            textAnnotation: null,
-            fullTextAnnotation: null,
-            fullTextAnnotationSplit: [],
-            data: {               //type vision api Request
-                "requests": [{
-                    "features": [{
-                        "type": "FACE_DETECTION"
-                    }],
-                    "image": {
-                        "content": null
-                    }
-                }]
-            },
-            textData : { // OCR request
-                "requests":[
-                {
-                    "image":{
-                            "content":null,
-                            },
-                    "features": [
-                    {
-                        "type":"TEXT_DETECTION" // DOCUMENT_TEXT_DETECTION
-                    }
-                    ],
-                    "imageContext": {
-                        "languageHints": ["en"]
-                    }
-                }
-                ]
-            }   
+            result: false
         }
     },
 
     computed: {
         ...mapGetters({
-            usersList: 'usersList',
             selectedImage: 'selectedImage',
             selectedImageBase64: 'selectedImageBase64',
             messageResult: 'messageResult',
