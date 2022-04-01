@@ -3,12 +3,7 @@ import detectTextApi from '../../api/detectTextAPI'
 import detectTextRequestBody from '../../api/models/detectTextModel'
 
 // store the regexes here
-const numberWithSpacesRegex = /\b(\s*[0-9]+\s*)\b/;
-const numberWithSpaceRegexOption = /\b([0-9\s]+)\b/
-const numberWithSpaceRegexOption_2 = /\b(?:\d[ -]*?){13,16}\b/
-const numberWithSpaceRegexOption_3 = /\\b[0-9]{4}\\s[0-9]{4}\\s[0-9]{4}\\s[0-9]{4}\\b/
-const numberWithSpaceRegexOption_4 = /(\\b\\d{4}\\s\\d{4}\\s\\d{4}\\s\\d{4}\\b)/
-const numberWithSpaceRegexOption_5 = /\b(?:\d{4}[ -]?){3}(?=\d{4}\b)/gm
+const numberWithSpacesRegex = /\b(\s*[0-9]+\s*)\b/
 
 // re = /^(0[1-9]|1[0-2])\/?([0-9]{4}|[0-9]{2})$/;
 // OR using word boundaries:
@@ -116,7 +111,7 @@ const actions = {
             // OCR Google Vision Deetxt Text Request body 
             // let detextTextData = detectTextRequestBody.detectTextRequestBody   
             
-            // let detectedText = ['792451', 'GDABSA', 'TITANIUM', '5311 1700 0000 0000', '00/00', 'Mastercard', 'HS CARDHOLDER', ''];
+            let detectedText = ['792451', 'GDABSA', 'TITANIUM', '5311 1700 0000 0000', '00/00', 'Mastercard', 'HS CARDHOLDER', ''];
 
             let discoveryCardText = ['AUTHORIZED SIGNATURE', 'CE CADENCE', 'CE CADENCE CA', 'ENCE CADENCE', 'ADENCE CADEN', 'CADEN', 'NOT VALID UNLESS SIGNED', 'E CADENCE CAL', 'NCE CADENCE', 'CE CADENCE C', 'CE CADENCE', 'DENCE CADENC', '6011 0000 0000 000O', 'VALID', 'THRU 08/15', 'CADENCE CADE', 'CADENCE CADE', 'ENCE CADENCE', 'CUSTOMER SERVICE: 1-800-636-7622', 'www.cadencebank.com', 'E CADENCE CA', 'DISCOVER', 'pulse', 'A DISCOVER COMPANY', 'CADENCE CAD', 'CE CADEN', 'ADEN', '']
             
@@ -124,7 +119,7 @@ const actions = {
             
             let discoveryCardText_3 = ['DISCOVER', '6OL1 0000 5656 0001', 'MEMBER SINCE', 'VALID THRU', '1999', '07/20', 'NR BRIAN COHEN', '']
 
-            this.dispatch('formatDetectedText', discoveryCardText_3)
+            this.dispatch('formatDetectedText', detectedText)
             
             // try {
             //     const base64Image = (state.selectedImageBase64).substring((state.selectedImageBase64).indexOf("base64,") + 7);
@@ -205,6 +200,7 @@ const actions = {
                 if(numberWithSpacesRegex.test(element)) {
                     console.log("numberWithSpacesRegex>>>>"+element)        
                 }
+
             }
 
             // if((numberWithSpacesRegex.test(element) || numberWithSpaceRegexOption.test(element)) 
@@ -226,7 +222,11 @@ const actions = {
         console.log("letPossibleCardNumber", letPossibleCardNumber)
         console.log("detectedText", detectedText)
 
-        letPossibleCardNumber ? validateCreditCardNumber(letPossibleCardNumber) : console.log("No func")
+        if(letPossibleCardNumber) {
+            validateCreditCardNumber(letPossibleCardNumber)
+        }else{
+            console.log("No func")
+        }
     }
 }
 
