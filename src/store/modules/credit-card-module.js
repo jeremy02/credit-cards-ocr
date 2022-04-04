@@ -4,12 +4,18 @@ import detectTextRequestBody from '../../api/models/detectTextModel'
 
 // store the regexes here
 const numberWithSpacesRegex = /\b(\s*[0-9]+\s*)\b/
+const numberWithSpacesRegex_2 = /^(\s*[0-9]+\s*)+$/
 
-// re = /^(0[1-9]|1[0-2])\/?([0-9]{4}|[0-9]{2})$/;
-// OR using word boundaries:
+// Check pattern for expiry data
+const moreThan3DigitsPattern = /(?:\d.*?){3,7}/
+const moreThan3DigitsPattern_2 = /(.*?\\d){3,7}/
 
-// re = /\b(0[1-9]|1[0-2])\/?([0-9]{4}|[0-9]{2})\b/;
-
+// NB Replace all the [0-9] below here with [1-9]
+const expriyDatePattern = /^(0[0-9]|1[0-2])\/?([0-9]{4}|[0-9]{2})$/
+// using word boundaries
+const expriyDatePattern_2 = /\b(0[0-9]|1[0-2])\/?([0-9]{4}|[0-9]{2})\b/ // these are outliers
+const expriyDatePattern_3 = /^(0[0-9]|1[0-2])\/?(([0-9]{4}|[0-9]{2})$)/
+const expriyDatePattern_4 = /\b(0[0-9]|1[0-2])\/?(([0-9]{4}|[0-9]{2})\b)/ // these are outliers
 
 
 
@@ -111,15 +117,15 @@ const actions = {
             // OCR Google Vision Deetxt Text Request body 
             // let detextTextData = detectTextRequestBody.detectTextRequestBody   
             
-            let detectedText = ['792451', 'GDABSA', 'TITANIUM', '5311 1700 0000 0000', '00/00', 'Mastercard', 'HS CARDHOLDER', ''];
+            let detextTextData = ['792451', 'GDABSA', 'TITANIUM', '5311 1700 0000 0000', '00/00', 'Mastercard', 'HS CARDHOLDER', ''];
 
-            let discoveryCardText = ['AUTHORIZED SIGNATURE', 'CE CADENCE', 'CE CADENCE CA', 'ENCE CADENCE', 'ADENCE CADEN', 'CADEN', 'NOT VALID UNLESS SIGNED', 'E CADENCE CAL', 'NCE CADENCE', 'CE CADENCE C', 'CE CADENCE', 'DENCE CADENC', '6011 0000 0000 000O', 'VALID', 'THRU 08/15', 'CADENCE CADE', 'CADENCE CADE', 'ENCE CADENCE', 'CUSTOMER SERVICE: 1-800-636-7622', 'www.cadencebank.com', 'E CADENCE CA', 'DISCOVER', 'pulse', 'A DISCOVER COMPANY', 'CADENCE CAD', 'CE CADEN', 'ADEN', '']
+            // let discoveryCardText = ['AUTHORIZED SIGNATURE', 'CE CADENCE', 'CE CADENCE CA', 'ENCE CADENCE', 'ADENCE CADEN', 'CADEN', 'NOT VALID UNLESS SIGNED', 'E CADENCE CAL', 'NCE CADENCE', 'CE CADENCE C', 'CE CADENCE', 'DENCE CADENC', '6011 0000 0000 000O', 'VALID', 'THRU 08/15', 'CADENCE CADE', 'CADENCE CADE', 'ENCE CADENCE', 'CUSTOMER SERVICE: 1-800-636-7622', 'www.cadencebank.com', 'E CADENCE CA', 'DISCOVER', 'pulse', 'A DISCOVER COMPANY', 'CADENCE CAD', 'CE CADEN', 'ADEN', '']
             
-            let discoveryCardText_2 = ['2X', 'DISC VER', 'CASHBACK', 'CHECKING', 'Rewards', 'b011 DO0D ODDD DD0D', '9 00/00', 'JL VEBB', 'Debit', '']
+            // let discoveryCardText_2 = ['2X', 'DISC VER', 'CASHBACK', 'CHECKING', 'Rewards', 'b011 DO0D ODDD DD0D', '9 00/00', 'JL VEBB', 'Debit', '']
             
-            let discoveryCardText_3 = ['DISCOVER', '6OL1 0000 5656 0001', 'MEMBER SINCE', 'VALID THRU', '1999', '07/20', 'NR BRIAN COHEN', '']
+            // let discoveryCardText_3 = ['DISCOVER', '6OL1 0000 5656 0001', 'MEMBER SINCE', 'VALID THRU', '1999', '07/20', 'NR BRIAN COHEN', '']
 
-            this.dispatch('formatDetectedText', detectedText)
+            this.dispatch('formatDetectedText', detextTextData)
             
             // try {
             //     const base64Image = (state.selectedImageBase64).substring((state.selectedImageBase64).indexOf("base64,") + 7);
@@ -181,53 +187,113 @@ const actions = {
     formatDetectedText({ dispatch, commit }, detectedText) {
 
         console.log("formatDetectedText>>>>", detectedText)
+        let possibleExpiryDate = null  
 
-        let letPossibleCardNumber = null        
+        // get the card number
+        let extractedCardNumber = getExpiryDateFromDetectedText(detectedText)
 
-        // loop through the detected text
-        detectedText.forEach( (element, index) => {
-            // to check if string contains digits with spaces but 12 characters or more
+        // get the expiry dates
+        let extractedExpiryDate = getExpiryDateFromDetectedText(detectedText)
 
-            if(element.length >=12) {
-                const trimmedElement = element.replace(/\s+/g, '') // && element.replace(" ", "")
+        console.log("extractedCardNumber>>>>", extractedCardNumber)
+        console.log("formatDetectedText 111>>>>", detectedText)
+        console.log("extractedExpiryDate>>>>", extractedExpiryDate)
+        console.log("formatDetectedText 2222>>>>", detectedText)
 
-                let percentageOfNumbers = (findTotalCount(trimmedElement) / trimmedElement.length) * 100
-                if(percentageOfNumbers > 60) {
-                    console.log("percentageOfNumbers>>>>"+percentageOfNumbers+" :::" + element)  
-                }    
+        // console.log("possibleCardNumber", possibleCardNumber)
+        // console.log("expriyDatePattern >>>>"+possibleExpiryDate)        
+        // console.log("detectedText", detectedText)
 
+        // if(possibleCardNumber) {
+        //     validateCreditCardNumber(possibleCardNumber)
+        // }
+    }
+}
 
-                if(numberWithSpacesRegex.test(element)) {
-                    console.log("numberWithSpacesRegex>>>>"+element)        
+// From the detected text Check if we can get the Card Number
+function getCardNumberFromDetectedText(detectedText) {
+    let result = null
+    // loop through the detected text and get the card number
+    detectedText.forEach( (element, index) => {
+        // to check if string contains digits with spaces but 12 characters or more
+        if(element.length >=12) {
+            // calculation using regex
+            let cardNumberRes = checkForPossibleCardNumberUsingRegex(element)
+
+            if(cardNumberRes) {
+                result = cardNumberRes
+            }else{
+                // calculation using ratio
+                cardNumberRes = checkForPossibleCardNumberUsingRatio(element)
+                if(cardNumberRes) {
+                    result = element
+                }
+            } 
+            
+            // remove this element from the array
+            if(result && cardNumberRes) {
+                detectedText.splice(index, 1)  
+            }    
+        }
+    })
+    return result   
+}
+
+// From the detected text Check if we can get the Expiry Date
+function getExpiryDateFromDetectedText(detectedText) {
+    let result = null
+    // loop through the detected text and get the card number
+    detectedText.forEach( (element, index) => {
+        // to check if string contains digits 3 to 7 characters
+        if((moreThan3DigitsPattern.test(element) || moreThan3DigitsPattern_2.test(element)) && element.indexOf("/") != -1) {
+                // Check for Expiry Date using Regexes
+                if(expriyDatePattern.test(element)){
+                    result = element
                 }
 
+                if(expriyDatePattern_2.test(element)){
+                    result = element
+                }
+
+                if(expriyDatePattern_3.test(element)){
+                    result = element
+                }
+
+                if(expriyDatePattern_4.test(element)){
+                    result = element
+                }
+
+                // remove this element from the array
+                if(result) {
+                }  
             }
+    })
+    return result 
+}
 
-            // if((numberWithSpacesRegex.test(element) || numberWithSpaceRegexOption.test(element)) 
-            //     && element.length >=12) {                
-
-            //         if(numberWithSpaceRegexOption_2.test(element)) {
-            //             console.log("numberWithSpaceRegexOption_2>>>>"+numberWithSpaceRegexOption_2)        
-            //         }
-
-
-            //         letPossibleCardNumber = element
-            //         // remove this from the array
-            //         detectedText.splice(index, 1)    
-            // }
-
-            // Check if we can have the name from here
-        })
-
-        console.log("letPossibleCardNumber", letPossibleCardNumber)
-        console.log("detectedText", detectedText)
-
-        if(letPossibleCardNumber) {
-            validateCreditCardNumber(letPossibleCardNumber)
-        }else{
-            console.log("No func")
-        }
+// Check if the string passed is a possible Credit Number
+// Using Regular Expressions
+function checkForPossibleCardNumberUsingRegex(str) {
+    let result = null
+    if(numberWithSpacesRegex.test(str)) {
+        result = str       
     }
+    return result   
+}
+
+// Check if the string passed is a possible Credit Number
+// Using Calculations of the possible digits to character ratio
+function checkForPossibleCardNumberUsingRatio(str) {
+    let result = null
+
+    // trim the string of empty spaces
+    const trimmedString = str.replace(/\s+/g, '') // && str.replace(" ", "")
+
+    let numbersRatio = (findTotalCount(trimmedString) / trimmedString.length) * 100
+    if(numbersRatio > 60) {
+        result = str
+    }
+    return result
 }
 
 function findTotalCount(str) {
