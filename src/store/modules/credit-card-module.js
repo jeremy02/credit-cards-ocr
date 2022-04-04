@@ -4,7 +4,8 @@ import detectTextRequestBody from '../../api/models/detectTextModel'
 
 // store the regexes here
 const numberWithSpacesRegex = /\b(\s*[0-9]+\s*)\b/
-const numberWithSpacesRegex_2 = /^(\s*[0-9]+\s*)+$/
+const replaceExpiryCardRegex = /[^\d/\///\/]/g
+const trimEmptySpaceRegex = /\s+/g
 
 // Check pattern for expiry data
 const moreThan3DigitsPattern = /(?:\d.*?){3,7}/
@@ -117,11 +118,11 @@ const actions = {
             // OCR Google Vision Deetxt Text Request body 
             // let detextTextData = detectTextRequestBody.detectTextRequestBody   
             
-            let detextTextData = ['792451', 'GDABSA', 'TITANIUM', '5311 1700 0000 0000', '00/00', 'Mastercard', 'HS CARDHOLDER', ''];
+            // let detextTextData = ['792451', 'GDABSA', 'TITANIUM', '5311 1700 0000 0000', '00/00', 'Mastercard', 'HS CARDHOLDER', ''];
 
-            // let discoveryCardText = ['AUTHORIZED SIGNATURE', 'CE CADENCE', 'CE CADENCE CA', 'ENCE CADENCE', 'ADENCE CADEN', 'CADEN', 'NOT VALID UNLESS SIGNED', 'E CADENCE CAL', 'NCE CADENCE', 'CE CADENCE C', 'CE CADENCE', 'DENCE CADENC', '6011 0000 0000 000O', 'VALID', 'THRU 08/15', 'CADENCE CADE', 'CADENCE CADE', 'ENCE CADENCE', 'CUSTOMER SERVICE: 1-800-636-7622', 'www.cadencebank.com', 'E CADENCE CA', 'DISCOVER', 'pulse', 'A DISCOVER COMPANY', 'CADENCE CAD', 'CE CADEN', 'ADEN', '']
+            let detextTextData = ['AUTHORIZED SIGNATURE', 'CE CADENCE', 'CE CADENCE CA', 'ENCE CADENCE', 'ADENCE CADEN', 'CADEN', 'NOT VALID UNLESS SIGNED', 'E CADENCE CAL', 'NCE CADENCE', 'CE CADENCE C', 'CE CADENCE', 'DENCE CADENC', '6011 0000 0000 000O', 'VALID', 'THRU 08/15', 'CADENCE CADE', 'CADENCE CADE', 'ENCE CADENCE', 'CUSTOMER SERVICE: 1-800-636-7622', 'www.cadencebank.com', 'E CADENCE CA', 'DISCOVER', 'pulse', 'A DISCOVER COMPANY', 'CADENCE CAD', 'CE CADEN', 'ADEN', '']
             
-            // let discoveryCardText_2 = ['2X', 'DISC VER', 'CASHBACK', 'CHECKING', 'Rewards', 'b011 DO0D ODDD DD0D', '9 00/00', 'JL VEBB', 'Debit', '']
+            // let detextTextData = ['2X', 'DISC VER', 'CASHBACK', 'CHECKING', 'Rewards', 'b011 DO0D ODDD DD0D', '9 00/00', 'JL VEBB', 'Debit', '']
             
             // let discoveryCardText_3 = ['DISCOVER', '6OL1 0000 5656 0001', 'MEMBER SINCE', 'VALID THRU', '1999', '07/20', 'NR BRIAN COHEN', '']
 
@@ -172,7 +173,7 @@ const actions = {
             //             }
             //         }             
             //     }  
-            // } catch (error) {
+            // } catch (error) 
             //     if(error.response.data.error.message) {
             //         msg.message = error.response.data.error.message
             //     }else{
@@ -186,54 +187,59 @@ const actions = {
     },
     formatDetectedText({ dispatch, commit }, detectedText) {
 
-        console.log("formatDetectedText>>>>", detectedText)
-        let possibleExpiryDate = null  
+        let extractedCardNumber = null
+        let extractedExpiryDate = null  
 
         // get the card number
-        let extractedCardNumber = getExpiryDateFromDetectedText(detectedText)
+        let cardNumberIndex = getCardNumberFromDetectedText(detectedText)
+        if(cardNumberIndex && cardNumberIndex != -1) {
+            extractedCardNumber = detectedText[cardNumberIndex]
+            detectedText.splice(cardNumberIndex, 1)  // remove this element from the array
+        }    
 
         // get the expiry dates
-        let extractedExpiryDate = getExpiryDateFromDetectedText(detectedText)
+        let expiryDateIndex = getExpiryDateFromDetectedText(detectedText)
+        if(expiryDateIndex && expiryDateIndex != -1) {
+            extractedExpiryDate = detectedText[expiryDateIndex]
 
-        console.log("extractedCardNumber>>>>", extractedCardNumber)
-        console.log("formatDetectedText 111>>>>", detectedText)
-        console.log("extractedExpiryDate>>>>", extractedExpiryDate)
-        console.log("formatDetectedText 2222>>>>", detectedText)
+            // Replace all non digit characters
+            extractedExpiryDate = extractedExpiryDate.replace(replaceExpiryCardRegex, '')
+            // trim all the empty spaces
+            extractedExpiryDate = extractedExpiryDate.replace(trimEmptySpaceRegex, '')
 
-        // console.log("possibleCardNumber", possibleCardNumber)
-        // console.log("expriyDatePattern >>>>"+possibleExpiryDate)        
-        // console.log("detectedText", detectedText)
+            detectedText.splice(expiryDateIndex, 1)  // remove this element from the array
+        }
 
-        // if(possibleCardNumber) {
-        //     validateCreditCardNumber(possibleCardNumber)
-        // }
+        console.log("extractedCardNumber::", extractedCardNumber)
+        console.log("extractedExpiryDate::", extractedExpiryDate)
+        console.log("detectedText::", detectedText)
+        validateCreditCardNumber(extractedCardNumber)
+        // NAMES REGEX 
     }
 }
 
 // From the detected text Check if we can get the Card Number
 function getCardNumberFromDetectedText(detectedText) {
-    let result = null
+    let result = -1
     // loop through the detected text and get the card number
     detectedText.forEach( (element, index) => {
         // to check if string contains digits with spaces but 12 characters or more
         if(element.length >=12) {
             // calculation using regex
             let cardNumberRes = checkForPossibleCardNumberUsingRegex(element)
+            
+            // calculation using ratio
+            let cardNumberResRatio = checkForPossibleCardNumberUsingRatio(element)
 
-            if(cardNumberRes) {
-                result = cardNumberRes
+            if(cardNumberRes !=-1 && cardNumberResRatio != -1) {
+                result = index
+                return result
             }else{
-                // calculation using ratio
-                cardNumberRes = checkForPossibleCardNumberUsingRatio(element)
-                if(cardNumberRes) {
-                    result = element
+                if(cardNumberResRatio != -1) {
+                    result = index
+                    return index
                 }
             } 
-            
-            // remove this element from the array
-            if(result && cardNumberRes) {
-                detectedText.splice(index, 1)  
-            }    
         }
     })
     return result   
@@ -241,31 +247,27 @@ function getCardNumberFromDetectedText(detectedText) {
 
 // From the detected text Check if we can get the Expiry Date
 function getExpiryDateFromDetectedText(detectedText) {
-    let result = null
+    let result = -1
     // loop through the detected text and get the card number
     detectedText.forEach( (element, index) => {
         // to check if string contains digits 3 to 7 characters
         if((moreThan3DigitsPattern.test(element) || moreThan3DigitsPattern_2.test(element)) && element.indexOf("/") != -1) {
                 // Check for Expiry Date using Regexes
                 if(expriyDatePattern.test(element)){
-                    result = element
+                    result = index
                 }
 
                 if(expriyDatePattern_2.test(element)){
-                    result = element
+                    result = index
                 }
 
                 if(expriyDatePattern_3.test(element)){
-                    result = element
+                    result = index
                 }
 
                 if(expriyDatePattern_4.test(element)){
-                    result = element
+                    result = index
                 }
-
-                // remove this element from the array
-                if(result) {
-                }  
             }
     })
     return result 
@@ -274,7 +276,7 @@ function getExpiryDateFromDetectedText(detectedText) {
 // Check if the string passed is a possible Credit Number
 // Using Regular Expressions
 function checkForPossibleCardNumberUsingRegex(str) {
-    let result = null
+    let result = -1
     if(numberWithSpacesRegex.test(str)) {
         result = str       
     }
@@ -284,13 +286,14 @@ function checkForPossibleCardNumberUsingRegex(str) {
 // Check if the string passed is a possible Credit Number
 // Using Calculations of the possible digits to character ratio
 function checkForPossibleCardNumberUsingRatio(str) {
-    let result = null
+    let result = -1
 
     // trim the string of empty spaces
     const trimmedString = str.replace(/\s+/g, '') // && str.replace(" ", "")
 
     let numbersRatio = (findTotalCount(trimmedString) / trimmedString.length) * 100
-    if(numbersRatio > 60) {
+    
+    if(parseFloat(numbersRatio) > parseFloat(80.0)) {
         result = str
     }
     return result
@@ -311,30 +314,38 @@ function validateCreditCardNumber(ccNum) {
 
     var isVisa = visaPattern.test( ccNum ) === true;
     var isMast = mastPattern.test( ccNum ) === true;
-    var isMast2 = mastPattern2Short.test( ccNum ) === true;
+    var isMast2 = mastPattern_2.test( ccNum ) === true;
+    var isMast3 = mastPattern_3.test( ccNum ) === true;
     var isAmex = amexPattern.test( ccNum ) === true
     var isDisc = discPattern.test( ccNum ) === true || discPattern_2.test( ccNum ) === true || discPattern_3.test( ccNum ) === true
 
-    if( isVisa || isMast || isAmex || isDisc ) {
         // at least one regex matches, so the card number is valid.
-
         if( isVisa ) {
             // Visa-specific logic goes here
             console.log("isVisa")
         }
-        else if( isMast ) {
+        
+        if( isMast ) {
              // Mastercard-specific logic goes here
             console.log("isMast")
         }
-        else if( isMast2 ) {
+        
+        if( isMast2 ) {
             // Mastercard-specific logic goes here
             console.log("isMast2")
         }
-        else if( isAmex ) {
+        
+        if( isMast3 ) {
+             // Mastercard-specific logic goes here
+            console.log("isMast3")
+        }
+        
+        if( isAmex ) {
             // AMEX-specific logic goes here
             console.log("isAmex")
         }
-        else if( isDisc ) {
+        
+        if( isDisc ) {
             // Discover-specific logic goes here
             console.log("isDisc")
 
@@ -342,10 +353,6 @@ function validateCreditCardNumber(ccNum) {
             console.log("discPattern_2:::" +discPattern_2.test( ccNum ))
             console.log("discPattern_3:::" +discPattern_3.test( ccNum ))
         }
-    }
-    else {
-        console.log("Please enter a valid card number.");
-    }
 }
 
 const mutations = { 
