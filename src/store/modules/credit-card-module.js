@@ -175,14 +175,7 @@ const actions = {
             extractedExpiryDate = extractedExpiryDate.replace(trimEmptySpaceRegex, '')
 
             detectedText.splice(expiryDateIndex, 1)  // remove this element from the array
-        }
-
-        getCardHolderNamesFromDetectedText(detectedText)
-
-        console.log("extractedCardNumber::", extractedCardNumber)
-        console.log("extractedExpiryDate::", extractedExpiryDate)
-        console.log("detectedText::", detectedText)
-        // NAMES REGEX 
+        }       
     }
 }
 
@@ -239,23 +232,6 @@ function getExpiryDateFromDetectedText(detectedText) {
             }
     })
     return result 
-}
-
-// From the detected text Check if we can get the Card Holder Name
-function getCardHolderNamesFromDetectedText(detectedText) {
-    let result = -1
-
-    const namesRegex = /^([a-zA-Z]{2,}\s[a-zA-Z]{1,}'?-?[a-zA-Z]{2,}\s?([a-zA-Z]{1,})?)/
-
-    console.log(detectedText)
-
-    // loop through the detected text and get the card number
-    detectedText.forEach( (element, index) => {
-        // /^([\w]{3,})+\s+([\w\s]{3,})+$/i
-            // calculation using regex
-        let cardNumberRes = namesRegex.test(element.toLowerCase())
-        console.log("cardNumberRes:::"+cardNumberRes, element)
-    }) 
 }
 
 // Check if the string passed is a possible Credit Number
