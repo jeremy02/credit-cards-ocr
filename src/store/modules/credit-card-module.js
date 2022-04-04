@@ -18,39 +18,6 @@ const expriyDatePattern_2 = /\b(0[0-9]|1[0-2])\/?([0-9]{4}|[0-9]{2})\b/ // these
 const expriyDatePattern_3 = /^(0[0-9]|1[0-2])\/?(([0-9]{4}|[0-9]{2})$)/
 const expriyDatePattern_4 = /\b(0[0-9]|1[0-2])\/?(([0-9]{4}|[0-9]{2})\b)/ // these are outliers
 
-
-
-// Store the regexes as globals so they're cached and not re-parsed on every call:
-// visa card regex patterns
-let visaPattern = /^(?:4[0-9]{12}(?:[0-9]{3})?)$/
-let visaPattern_2 = / ^4[0-9]{12}(?:[0-9]{3})?$/
-
-// Visa Master Card regex patterns
-let visaMasterCardPattern  = /^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14})$/
-
-// master card regex patterns
-let mastPattern = /^(?:5[1-5][0-9]{14})$/
-var mastPattern_2 = /^(?:5[1-5][0-9]{2}|222[1-9]|22[3-9][0-9]|2[3-6][0-9]{2}|27[01][0-9]|2720)[0-9]{12}$/
-let mastPattern_3 = /^5[1-5][0-9]{14}$/
-
-// Union Pay Card regex patterns
-let unionPayCardPattern = /^(62[0-9]{14,17})$/ 
-
-// American Express card regex patterns
-let amexPattern = /^(?:3[47][0-9]{13})$/
-let amexPattern_2 = /^3[47][0-9]{13}$/
-
-// Diners Club regex patterns
-let dinersClubPattern = /^3(?:0[0-5]|[68][0-9])[0-9]{11}$/
-
-// Discover Card regex patterns
-let discPattern = /^(?:6(?:011|5[0-9][0-9])[0-9]{12})$/
-let discPattern_2 = /^6(?:011|5[0-9]{2})[0-9]{12}$/
-let discPattern_3 = /^65[4-9][0-9]{13}|64[4-9][0-9]{13}|6011[0-9]{12}|(622(?:12[6-9]|1[3-9][0-9]|[2-8][0-9][0-9]|9[01][0-9]|92[0-5])[0-9]{10})$/
-
-// JCB: Card regex patterns
-let jDBPattern = /^(?:2131|1800|35\d{3})\d{11}$/
-
 let initialMessage = {
     success: false,
     message: null,
@@ -120,11 +87,11 @@ const actions = {
             
             // let detextTextData = ['792451', 'GDABSA', 'TITANIUM', '5311 1700 0000 0000', '00/00', 'Mastercard', 'HS CARDHOLDER', ''];
 
-            let detextTextData = ['AUTHORIZED SIGNATURE', 'CE CADENCE', 'CE CADENCE CA', 'ENCE CADENCE', 'ADENCE CADEN', 'CADEN', 'NOT VALID UNLESS SIGNED', 'E CADENCE CAL', 'NCE CADENCE', 'CE CADENCE C', 'CE CADENCE', 'DENCE CADENC', '6011 0000 0000 000O', 'VALID', 'THRU 08/15', 'CADENCE CADE', 'CADENCE CADE', 'ENCE CADENCE', 'CUSTOMER SERVICE: 1-800-636-7622', 'www.cadencebank.com', 'E CADENCE CA', 'DISCOVER', 'pulse', 'A DISCOVER COMPANY', 'CADENCE CAD', 'CE CADEN', 'ADEN', '']
+            // let detextTextData = ['AUTHORIZED SIGNATURE', 'CE CADENCE', 'CE CADENCE CA', 'ENCE CADENCE', 'ADENCE CADEN', 'CADEN', 'NOT VALID UNLESS SIGNED', 'E CADENCE CAL', 'NCE CADENCE', 'CE CADENCE C', 'CE CADENCE', 'DENCE CADENC', '6011 0000 0000 000O', 'VALID', 'THRU 08/15', 'CADENCE CADE', 'CADENCE CADE', 'ENCE CADENCE', 'CUSTOMER SERVICE: 1-800-636-7622', 'www.cadencebank.com', 'E CADENCE CA', 'DISCOVER', 'pulse', 'A DISCOVER COMPANY', 'CADENCE CAD', 'CE CADEN', 'ADEN', '']
             
             // let detextTextData = ['2X', 'DISC VER', 'CASHBACK', 'CHECKING', 'Rewards', 'b011 DO0D ODDD DD0D', '9 00/00', 'JL VEBB', 'Debit', '']
             
-            // let discoveryCardText_3 = ['DISCOVER', '6OL1 0000 5656 0001', 'MEMBER SINCE', 'VALID THRU', '1999', '07/20', 'NR BRIAN COHEN', '']
+            let detextTextData = ['DISCOVER', '6OL1 0000 5656 0001', 'MEMBER SINCE', 'VALID THRU', '1999', '07/20', 'NR BRIAN COHEN', '']
 
             this.dispatch('formatDetectedText', detextTextData)
             
@@ -210,10 +177,11 @@ const actions = {
             detectedText.splice(expiryDateIndex, 1)  // remove this element from the array
         }
 
+        getCardHolderNamesFromDetectedText(detectedText)
+
         console.log("extractedCardNumber::", extractedCardNumber)
         console.log("extractedExpiryDate::", extractedExpiryDate)
         console.log("detectedText::", detectedText)
-        validateCreditCardNumber(extractedCardNumber)
         // NAMES REGEX 
     }
 }
@@ -231,7 +199,7 @@ function getCardNumberFromDetectedText(detectedText) {
             // calculation using ratio
             let cardNumberResRatio = checkForPossibleCardNumberUsingRatio(element)
 
-            if(cardNumberRes !=-1 && cardNumberResRatio != -1) {
+            if(cardNumberRes !=-1 || cardNumberResRatio != -1) {
                 result = index
                 return result
             }else{
@@ -273,6 +241,23 @@ function getExpiryDateFromDetectedText(detectedText) {
     return result 
 }
 
+// From the detected text Check if we can get the Card Holder Name
+function getCardHolderNamesFromDetectedText(detectedText) {
+    let result = -1
+
+    const namesRegex = /^([a-zA-Z]{2,}\s[a-zA-Z]{1,}'?-?[a-zA-Z]{2,}\s?([a-zA-Z]{1,})?)/
+
+    console.log(detectedText)
+
+    // loop through the detected text and get the card number
+    detectedText.forEach( (element, index) => {
+        // /^([\w]{3,})+\s+([\w\s]{3,})+$/i
+            // calculation using regex
+        let cardNumberRes = namesRegex.test(element.toLowerCase())
+        console.log("cardNumberRes:::"+cardNumberRes, element)
+    }) 
+}
+
 // Check if the string passed is a possible Credit Number
 // Using Regular Expressions
 function checkForPossibleCardNumberUsingRegex(str) {
@@ -307,52 +292,6 @@ function findTotalCount(str) {
     // return digitsArr
   }
   return 0
-}
-
-function validateCreditCardNumber(ccNum) {
-    ccNum = ccNum.replace(/\s+/g, '')
-
-    var isVisa = visaPattern.test( ccNum ) === true;
-    var isMast = mastPattern.test( ccNum ) === true;
-    var isMast2 = mastPattern_2.test( ccNum ) === true;
-    var isMast3 = mastPattern_3.test( ccNum ) === true;
-    var isAmex = amexPattern.test( ccNum ) === true
-    var isDisc = discPattern.test( ccNum ) === true || discPattern_2.test( ccNum ) === true || discPattern_3.test( ccNum ) === true
-
-        // at least one regex matches, so the card number is valid.
-        if( isVisa ) {
-            // Visa-specific logic goes here
-            console.log("isVisa")
-        }
-        
-        if( isMast ) {
-             // Mastercard-specific logic goes here
-            console.log("isMast")
-        }
-        
-        if( isMast2 ) {
-            // Mastercard-specific logic goes here
-            console.log("isMast2")
-        }
-        
-        if( isMast3 ) {
-             // Mastercard-specific logic goes here
-            console.log("isMast3")
-        }
-        
-        if( isAmex ) {
-            // AMEX-specific logic goes here
-            console.log("isAmex")
-        }
-        
-        if( isDisc ) {
-            // Discover-specific logic goes here
-            console.log("isDisc")
-
-            console.log("discPattern_1:::" +discPattern_1.test( ccNum ))
-            console.log("discPattern_2:::" +discPattern_2.test( ccNum ))
-            console.log("discPattern_3:::" +discPattern_3.test( ccNum ))
-        }
 }
 
 const mutations = { 
