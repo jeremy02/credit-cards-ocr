@@ -36,9 +36,12 @@
                     <div class="text-xs-center" v-show="loader">
                         <v-progress-circular indeterminate v-bind:size="100" v-bind:width="3" class="teal--text"></v-progress-circular>
                     </div>
-                    <div v-show="textAnnotationsDesc || fullTextAnnotationsDesc" class="text-md-center">
+                    <div v-show="textAnnotationsDesc || fullTextAnnotationsDesc || extractedDetectedText || extractedCardNumber" class="text-md-center">
                         <p v-show="textAnnotationsDesc">Extracted Text: <span class="blue--text">{{ textAnnotationsDesc }}</span></p>
                         <p v-show="fullTextAnnotationsDesc">Full Text: <span class="red--text">{{ fullTextAnnotationsDesc }}</span></p>
+                        <p v-show="extractedDetectedText">Text Detected: <span class="red--text">{{ extractedDetectedText }}</span></p>
+                        <p v-show="extractedCardNumber">Card Number Detected: <span class="red--text">{{ extractedCardNumber }}</span></p>
+                        <p v-show="extractedExpiryDate">Card Expiry Date Detected: <span class="red--text">{{ extractedExpiryDate }}</span></p>
                         <!-- <p class="black--text" v-for="(item, index) in fullTextAnnotationSplit" :key="index">
                             {{ index }} - {{ item }}
                         </p> -->
@@ -62,17 +65,18 @@ export default {
             result: false,
         }
     },
-    
     computed: {
         ...mapGetters({
             messageResult: 'messageResult',
             selectedImage: 'selectedImage',
             selectedImageBase64: 'selectedImageBase64',
             textAnnotationsDesc: 'textAnnotationsDesc',
-            fullTextAnnotationsDesc: 'fullTextAnnotationsDesc',
+            fullTextAnnotationsDesc: 'fullTextAnnotationsDesc',            
+            extractedDetectedText: 'extractedDetectedText',
+            extractedCardNumber: 'extractedCardNumber',
+            extractedExpiryDate: 'extractedExpiryDate',
         }),
     },
-
     methods: {
         ...mapActions(["handleImageSelect", "detectTextFromImage"]),
     },

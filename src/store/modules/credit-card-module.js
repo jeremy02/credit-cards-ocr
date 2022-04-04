@@ -31,7 +31,10 @@ const state = {
       message: null,
     },
     textAnnotationsDesc: null,
-    fullTextAnnotationsDesc: null
+    fullTextAnnotationsDesc: null,
+    extractedDetectedText: null,
+    extractedCardNumber: null,
+    extractedExpiryDate: null
 };
 
 const getters = {
@@ -39,7 +42,10 @@ const getters = {
     selectedImageBase64: state => state.selectedImageBase64,
     messageResult: state => state.messageResult,
     textAnnotationsDesc: state => state.textAnnotationsDesc,
-    fullTextAnnotationsDesc: state => state.fullTextAnnotationsDesc
+    fullTextAnnotationsDesc: state => state.fullTextAnnotationsDesc,
+    extractedDetectedText: state => state.extractedDetectedText,
+    extractedCardNumber: state => state.extractedCardNumber,
+    extractedExpiryDate: state => state.extractedExpiryDate,
 }
 
 const actions = {
@@ -91,9 +97,11 @@ const actions = {
             
             // let detextTextData = ['2X', 'DISC VER', 'CASHBACK', 'CHECKING', 'Rewards', 'b011 DO0D ODDD DD0D', '9 00/00', 'JL VEBB', 'Debit', '']
             
-            let detextTextData = ['DISCOVER', '6OL1 0000 5656 0001', 'MEMBER SINCE', 'VALID THRU', '1999', '07/20', 'NR BRIAN COHEN', '']
+            // let detextTextData = ['DISCOVER', '6OL1 0000 5656 0001', 'MEMBER SINCE', 'VALID THRU', '1999', '07/20', 'NR BRIAN COHEN', '']
 
-            this.dispatch('formatDetectedText', detextTextData)
+            let detectedTextData = [ "0123 4567 8901 2345", "VÁLIDO", "ATÉ", "RENATA BRASIL", "0987343", "12345678", "mastercard", "CONVÊNIO PEC", "IDENTIFICADOR", "" ]
+
+            this.dispatch('formatDetectedText', detectedTextData)
             
             // try {
             //     const base64Image = (state.selectedImageBase64).substring((state.selectedImageBase64).indexOf("base64,") + 7);
@@ -124,8 +132,8 @@ const actions = {
             //         commit("addMessage", msg)
             //     }else{
             //         // set the responses
-            //         commit("setDetectTextDescResponse", textAnnotationsDesc)
-            //         commit("setDetectTextFullDescResponse", fullTextAnnotationsDesc)
+            //         // commit("setDetectTextDescResponse", textAnnotationsDesc)
+            //         // commit("setDetectTextFullDescResponse", fullTextAnnotationsDesc)
 
             //         // just do operations on one of the above results
             //         // format the text to extract details
@@ -140,10 +148,10 @@ const actions = {
             //             }
             //         }             
             //     }  
-            // } catch (error) 
-            //     if(error.response.data.error.message) {
+            // } catch (error) {
+            //     if (error.response.data.error.message) {
             //         msg.message = error.response.data.error.message
-            //     }else{
+            //     } else{
             //         msg.message = error.message
             //     }
                 
@@ -153,13 +161,16 @@ const actions = {
         }
     },
     formatDetectedText({ dispatch, commit }, detectedText) {
-
         let extractedCardNumber = null
-        let extractedExpiryDate = null  
+        let extractedExpiryDate = null
+        let extractedDetectedText = detectedText
 
         // get the card number
         let cardNumberIndex = getCardNumberFromDetectedText(detectedText)
         if(cardNumberIndex && cardNumberIndex != -1) {
+            
+            console.log("1:::"+detectedText[cardNumberIndex])
+
             extractedCardNumber = detectedText[cardNumberIndex]
             detectedText.splice(cardNumberIndex, 1)  // remove this element from the array
         }    
@@ -175,34 +186,43 @@ const actions = {
             extractedExpiryDate = extractedExpiryDate.replace(trimEmptySpaceRegex, '')
 
             detectedText.splice(expiryDateIndex, 1)  // remove this element from the array
-        }       
+        }
+        
+        commit("setDetectedText", extractedDetectedText)  // the detected text
+        commit("setCardNumber", extractedCardNumber)  // the detected Card Number
+        commit("setExpiryDate", extractedExpiryDate) // the detected Expiry Date
     }
 }
 
 // From the detected text Check if we can get the Card Number
 function getCardNumberFromDetectedText(detectedText) {
     let result = -1
+
     // loop through the detected text and get the card number
-    detectedText.forEach( (element, index) => {
+    for( let index in detectedText ) {
+        // var value = obj[key];
+        let element = detectedText[index]
+
         // to check if string contains digits with spaces but 12 characters or more
         if(element.length >=12) {
             // calculation using regex
             let cardNumberRes = checkForPossibleCardNumberUsingRegex(element)
-            
-            // calculation using ratio
-            let cardNumberResRatio = checkForPossibleCardNumberUsingRatio(element)
 
-            if(cardNumberRes !=-1 || cardNumberResRatio != -1) {
+            if(cardNumberRes !=-1) {
                 result = index
                 return result
+                break
             }else{
+                // calculation using ratio
+                let cardNumberResRatio = checkForPossibleCardNumberUsingRatio(element)
                 if(cardNumberResRatio != -1) {
                     result = index
-                    return index
+                    return result
+                    break
                 }
             } 
         }
-    })
+    }
     return result   
 }
 
@@ -250,7 +270,7 @@ function checkForPossibleCardNumberUsingRatio(str) {
     let result = -1
 
     // trim the string of empty spaces
-    const trimmedString = str.replace(/\s+/g, '') // && str.replace(" ", "")
+    const trimmedString = str.replace(trimEmptySpaceRegex, '') // && str.replace(" ", "")
 
     let numbersRatio = (findTotalCount(trimmedString) / trimmedString.length) * 100
     
@@ -296,6 +316,15 @@ const mutations = {
     },
     setDetectTextFullDescResponse: function(state, fullTextAnnotationsDesc) {
         state.fullTextAnnotationsDesc = fullTextAnnotationsDesc
+    },
+    setDetectedText: function(state, detectedText) {
+        state.extractedDetectedText = detectedText
+    },
+    setCardNumber: function(state, cardNumber) {
+        state.extractedCardNumber = cardNumber
+    },
+    setExpiryDate: function(state, expiryDate) {
+        state.extractedExpiryDate = expiryDate
     }
 };
 
