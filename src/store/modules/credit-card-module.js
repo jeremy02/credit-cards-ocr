@@ -168,9 +168,6 @@ const actions = {
         // get the card number
         let cardNumberIndex = getCardNumberFromDetectedText(detectedText)
         if(cardNumberIndex && cardNumberIndex != -1) {
-            
-            console.log("1:::"+detectedText[cardNumberIndex])
-
             extractedCardNumber = detectedText[cardNumberIndex]
             detectedText.splice(cardNumberIndex, 1)  // remove this element from the array
         }    
@@ -200,7 +197,6 @@ function getCardNumberFromDetectedText(detectedText) {
 
     // loop through the detected text and get the card number
     for( let index in detectedText ) {
-        // var value = obj[key];
         let element = detectedText[index]
 
         // to check if string contains digits with spaces but 12 characters or more
@@ -230,27 +226,37 @@ function getCardNumberFromDetectedText(detectedText) {
 function getExpiryDateFromDetectedText(detectedText) {
     let result = -1
     // loop through the detected text and get the card number
-    detectedText.forEach( (element, index) => {
+    for( let index in detectedText ) {
+        let element = detectedText[index]
+        
         // to check if string contains digits 3 to 7 characters
         if((moreThan3DigitsPattern.test(element) || moreThan3DigitsPattern_2.test(element)) && element.indexOf("/") != -1) {
-                // Check for Expiry Date using Regexes
-                if(expriyDatePattern.test(element)){
-                    result = index
-                }
-
-                if(expriyDatePattern_2.test(element)){
-                    result = index
-                }
-
-                if(expriyDatePattern_3.test(element)){
-                    result = index
-                }
-
-                if(expriyDatePattern_4.test(element)){
-                    result = index
-                }
+            // Check for Expiry Date using Regexes
+            if(expriyDatePattern.test(element)){
+                result = index
+                return result
+                break
             }
-    })
+
+            if(expriyDatePattern_2.test(element)){
+                result = index
+                return result
+                break
+            }
+
+            if(expriyDatePattern_3.test(element)){
+                result = index
+                return result
+                break
+            }
+
+            if(expriyDatePattern_4.test(element)){
+                result = index
+                return result
+                break
+            }
+        }
+    }
     return result 
 }
 
