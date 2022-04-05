@@ -1672,10 +1672,10 @@
     "safe-buffer" "^5.0.1"
     "sha.js" "^2.4.8"
 
-"credit-cards-detect-text@^1.0.27":
-  "integrity" "sha512-/W1JltPEi0OPiBfVJBpqEk5xsgvVeHY4InH25K3v3b1Wzdr4wEYEubPP1vooU2/JxSKV8cU7F7ZbUGtM6xlv2w=="
-  "resolved" "https://registry.npmjs.org/credit-cards-detect-text/-/credit-cards-detect-text-1.0.27.tgz"
-  "version" "1.0.27"
+"credit-cards-detect-text@^1.0.28":
+  "integrity" "sha512-4OQy5mMeiyIkMyZ+7hx7LE1wvbTNwIE2JrF4Ml1XsmEVhbtPZbJZ39ELbdTDZ4lKlNJhrOSPQThJ4d4WBdcfBA=="
+  "resolved" "https://registry.npmjs.org/credit-cards-detect-text/-/credit-cards-detect-text-1.0.28.tgz"
+  "version" "1.0.28"
   dependencies:
     "axios" "^0.26.1"
 

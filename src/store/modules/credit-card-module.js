@@ -100,7 +100,7 @@ const actions = {
                 const response = await detectTextApi.detectTextFromImage(detextTextData)
 
                 // get the first index response
-                const detectedTextResponse = response.data .responses[0];
+                const detectedTextResponse = response.data.responses[0];
 
                 // we have all the descriptions from textAnnotations
                 const annotationResult = detectedTextResponse.textAnnotations;
