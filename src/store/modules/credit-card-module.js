@@ -1,4 +1,3 @@
-import axios from 'axios'
 import detectTextApi from '../../api/detectTextAPI'
 import detectTextRequestBody from '../../api/models/detectTextModel'
 

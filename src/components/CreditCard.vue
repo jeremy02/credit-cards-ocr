@@ -21,14 +21,8 @@
                         <canvas id="canvas" width="600" height="480" style="display: none;"></canvas>
                     </v-card>
 
-                    <input v-show="!testingNPMCode && !testingNPMCodeAsync" @change="handleImageSelect($event)" class="custom-input my-4"
+                    <input v-show="!testingNPMCode || !testingNPMCodeAsync" @change="handleImageSelect($event)" class="custom-input my-4"
                         type="file" block accept="image/x-png,image/gif,image/jpeg,image/jpg">
-
-                    <input v-show="testingNPMCode" @change="handleImage($event)" class="custom-input my-4"
-                        type="file" block accept="image/x-png,image/gif,image/jpeg,image/jpg">
-
-                  <input v-show="testingNPMCodeAsync" @change="handleImageAsync($event)" class="custom-input my-4"
-                         type="file" block accept="image/x-png,image/gif,image/jpeg,image/jpg">
 
                     <v-btn @click.native="detectTextFromImage" block class="red" :disabled="!selectedImageBase64">
                         <v-icon left>camera_alt</v-icon> Detect Text
@@ -42,15 +36,12 @@
                     <div class="text-xs-center" v-show="loader">
                         <v-progress-circular indeterminate v-bind:size="100" v-bind:width="3" class="teal--text"></v-progress-circular>
                     </div>
-                    <div v-show="textAnnotationsDesc || fullTextAnnotationsDesc || extractedDetectedText || extractedCardNumber || extractedExpiryDate" class="text-md-center">
+                    <div v-show="textAnnotationsDesc || fullTextAnnotationsDesc" class="text-md-center">
                         <p v-show="textAnnotationsDesc">Extracted Text: <span class="blue--text">{{ textAnnotationsDesc }}</span></p>
                         <p v-show="fullTextAnnotationsDesc">Full Text: <span class="red--text">{{ fullTextAnnotationsDesc }}</span></p>
                         <p v-show="extractedDetectedText">Text Detected: <span class="red--text">{{ extractedDetectedText }}</span></p>
                         <p v-show="extractedCardNumber">Card Number Detected: <span class="red--text">{{ extractedCardNumber }}</span></p>
                         <p v-show="extractedExpiryDate">Card Expiry Date Detected: <span class="red--text">{{ extractedExpiryDate }}</span></p>
-                        <!-- <p class="black--text" v-for="(item, index) in fullTextAnnotationSplit" :key="index">
-                            {{ index }} - {{ item }}
-                        </p> -->
                     </div>
                 </v-flex>
 
@@ -61,9 +52,8 @@
 </template>
 
 <script>
-import {mapGetters, mapActions} from "vuex";
 
-import getDetectedText from "credit-cards-detect-text"
+import {mapActions, mapGetters} from "vuex";
 
 export default {
     name: 'CreditCard',
@@ -71,8 +61,8 @@ export default {
         return{
             loader: false,
             result: false,
-            testingNPMCode: true,
-            testingNPMCodeAsync: false,
+            testingNPMCode: false,
+            testingNPMCodeAsync: true,
         }
     },
     computed: {
@@ -89,39 +79,14 @@ export default {
     },
     methods: {
         ...mapActions(["handleImageSelect", "detectTextFromImage"]),
-
-        handleImage: function(e) {
-
-            console.log("handleImage")
-
-             console.log("handleImage 2222::::", e instanceof Event)
-
-            console.log("handleImage 3333::::", (e.target.files[0]) instanceof File)
-
-            const selectedImage = e.target.files[0] // post the event
-
-            // getDetectedText(selectedImage)
-            //     .then(response => {
-            //         console.log("response", JSON.stringify(response))
-            //     })
-            //     .catch((err) => {
-            //         console.log("err", err)
-            //     })
-        },
-
-        handleImageAsync : async(e) => {
-          console.log("testingNPMCodeAsync")
-            const selectedImage = e // post the event
-            const result  = await getDetectedText(selectedImage)
-            console.log("response 111::::::", JSON.stringify(result))
-        },
     },
 }
+
 </script>
 
 
 <style>
-p {
-    font-size: 18px
-}
+  p {
+      font-size: 18px
+  }
 </style>
