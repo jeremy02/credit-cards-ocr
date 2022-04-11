@@ -1,28 +1,34 @@
 <template>
     <div class="clearfix">
-    
-       <div class="clearfix mb-4">            
+
+       <div class="clearfix mb-4">
             <v-layout row wrap>
-                
+
                 <!--The Image-->
                 <v-flex xs12 sm12 md6 lg6 xl6>
-                
-                    <v-card  class="pa-2 mb-2" 
+
+                    <v-card  class="pa-2 mb-2"
                     :class="[
                         messageResult.success ? 'green' : 'red',
-                    ]" v-if="messageResult.message"> 
+                    ]" v-if="messageResult.message">
                         <span class="text-white">
                             {{ messageResult.message }}
                         </span>
                     </v-card>
 
-                    <v-card>   
+                    <v-card>
                         <img style="" width="100%" height="50%" :src="selectedImageBase64" alt="Credit Card Image">
                         <canvas id="canvas" width="600" height="480" style="display: none;"></canvas>
                     </v-card>
 
-                    <input @change="handleImageSelect($event)" class="custom-input my-4" 
+                    <input v-show="!testingNPMCode && !testingNPMCodeAsync" @change="handleImageSelect($event)" class="custom-input my-4"
                         type="file" block accept="image/x-png,image/gif,image/jpeg,image/jpg">
+
+                    <input v-show="testingNPMCode" @change="handleImage($event)" class="custom-input my-4"
+                        type="file" block accept="image/x-png,image/gif,image/jpeg,image/jpg">
+
+                  <input v-show="testingNPMCodeAsync" @change="handleImageAsync($event)" class="custom-input my-4"
+                         type="file" block accept="image/x-png,image/gif,image/jpeg,image/jpg">
 
                     <v-btn @click.native="detectTextFromImage" block class="red" :disabled="!selectedImageBase64">
                         <v-icon left>camera_alt</v-icon> Detect Text
@@ -47,9 +53,9 @@
                         </p> -->
                     </div>
                 </v-flex>
-            
-            </v-layout>           
-       </div> 
+
+            </v-layout>
+       </div>
     </div>
 
 </template>
@@ -57,12 +63,16 @@
 <script>
 import {mapGetters, mapActions} from "vuex";
 
+import getDetectedText from "credit-cards-detect-text"
+
 export default {
     name: 'CreditCard',
     data: function() {
         return{
             loader: false,
             result: false,
+            testingNPMCode: true,
+            testingNPMCodeAsync: false,
         }
     },
     computed: {
@@ -71,7 +81,7 @@ export default {
             selectedImage: 'selectedImage',
             selectedImageBase64: 'selectedImageBase64',
             textAnnotationsDesc: 'textAnnotationsDesc',
-            fullTextAnnotationsDesc: 'fullTextAnnotationsDesc',            
+            fullTextAnnotationsDesc: 'fullTextAnnotationsDesc',
             extractedDetectedText: 'extractedDetectedText',
             extractedCardNumber: 'extractedCardNumber',
             extractedExpiryDate: 'extractedExpiryDate',
@@ -79,6 +89,32 @@ export default {
     },
     methods: {
         ...mapActions(["handleImageSelect", "detectTextFromImage"]),
+
+        handleImage: function(e) {
+
+            console.log("handleImage")
+
+             console.log("handleImage 2222::::", e instanceof Event)
+
+            console.log("handleImage 3333::::", (e.target.files[0]) instanceof File)
+
+            const selectedImage = e.target.files[0] // post the event
+
+            // getDetectedText(selectedImage)
+            //     .then(response => {
+            //         console.log("response", JSON.stringify(response))
+            //     })
+            //     .catch((err) => {
+            //         console.log("err", err)
+            //     })
+        },
+
+        handleImageAsync : async(e) => {
+          console.log("testingNPMCodeAsync")
+            const selectedImage = e // post the event
+            const result  = await getDetectedText(selectedImage)
+            console.log("response 111::::::", JSON.stringify(result))
+        },
     },
 }
 </script>

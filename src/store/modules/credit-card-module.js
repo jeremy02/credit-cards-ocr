@@ -2,7 +2,7 @@ import axios from 'axios'
 import detectTextApi from '../../api/detectTextAPI'
 import detectTextRequestBody from '../../api/models/detectTextModel'
 
-import detectTextFunctions from './detectText';
+import detectTextFunctions from './detectText'
 
 // store the regexes here
 const replaceExpiryCardRegex = /[^\d/\///\/]/g
@@ -13,7 +13,7 @@ let initialMessage = {
     message: null,
 };
 
-const state = { 
+const state = {
     selectedImage: null,
     selectedImageBase64: null,
     messageResult: {
@@ -40,33 +40,33 @@ const getters = {
 
 const actions = {
     async handleImageSelect({commit}, event){
-        // reset the data and fields 
+        // reset the data and fields
         commit("resetData")
 
         // init the message to return
         let msg = initialMessage;
-        
+
         // Check if there is a file
         if(!event.target.files) {
             msg.message = "No file was found to perform operation";
         }
-        
+
         // Check if there was a file object
         if(event.target.files.length < 1) {
             msg.message = "Please upload an image/file to perform operation";
         }
 
-        // should not allow upload of more than one file 
+        // should not allow upload of more than one file
         if(event.target.files.length > 1) {
             msg.message = "Only one file or image allowed to perform operation";
         }
-        
+
         // if we have a message
         if(msg.message) {
             commit("addMessage", msg)
         }else{
             const fileObject = event.target.files[0]
-            
+
             commit("setSelectedImage", fileObject) // set the image src
 
             // create Base64 Image
@@ -86,14 +86,14 @@ const actions = {
             msg.message = "No file was found to detect text operation";
             await commit("addMessage", msg)
         }else{
-            // OCR Google Vision Deetxt Text Request body 
-            let detextTextData = detectTextRequestBody.detectTextRequestBody   
-                        
+            // OCR Google Vision Deetxt Text Request body
+            let detextTextData = detectTextRequestBody.detectTextRequestBody
+
             this.dispatch('formatDetectedText', detextTextData)
-            
+
             try {
                 const base64Image = (state.selectedImageBase64).substring((state.selectedImageBase64).indexOf("base64,") + 7);
-            
+
                 // add the base64 image to the request body
                 detextTextData.requests[0].image.content = base64Image;
 
@@ -113,7 +113,7 @@ const actions = {
                 // this is the full text annotation
                 let fullTextAnnotationsDesc = detectedTextResponse.fullTextAnnotation.text ? detectedTextResponse.fullTextAnnotation.text : null;
 
-                //  do we have text that was detected    
+                //  do we have text that was detected
                 if(!textAnnotationsDesc && !fullTextAnnotationsDesc) {
                     // init the message to return
                     msg.message = "No text was detected from the image";
@@ -134,15 +134,15 @@ const actions = {
                             msg.message = "No text was detected from the image to perform operation";
                             commit("addMessage", msg)
                         }
-                    }             
-                }  
+                    }
+                }
             } catch (error) {
                 if (error.response.data.error.message) {
                     msg.message = error.response.data.error.message
                 } else{
                     msg.message = error.message
                 }
-                
+
                 // add the error message
                 await commit("addMessage", msg)
             }
@@ -158,7 +158,7 @@ const actions = {
         if(cardNumberIndex && cardNumberIndex != -1) {
             extractedCardNumber = detectedText[cardNumberIndex]
             detectedText.splice(cardNumberIndex, 1)  // remove this element from the array
-        }    
+        }
 
         // get the expiry dates
         let expiryDateIndex = detectTextFunctions.getExpiryDateFromDetectedText(detectedText)
@@ -172,14 +172,14 @@ const actions = {
 
             detectedText.splice(expiryDateIndex, 1)  // remove this element from the array
         }
-        
+
         commit("setDetectedText", extractedDetectedText)  // the detected text
         commit("setCardNumber", extractedCardNumber)  // the detected Card Number
         commit("setExpiryDate", extractedExpiryDate) // the detected Expiry Date
     }
 }
 
-const mutations = { 
+const mutations = {
     addMessage: (state, data) => (
         state.messageResult = data
     ),
