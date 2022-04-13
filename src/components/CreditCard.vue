@@ -11,7 +11,7 @@
                             {{ messageResult.message }}
                         </span>
                     </v-card>
-                  
+
                     <v-card v-if="selectedImageBase64">
                       <img class="img-responsive img-thumbnail" width="100%" height="50%" :src="selectedImageBase64" alt="Credit Card Image">
                       <canvas id="canvas" width="600" height="480" style="display: none;"></canvas>
@@ -23,9 +23,6 @@
                                    block accept="image/x-png,image/gif,image/jpeg,image/jpg" class="input-file">
                             <p v-if="!detectingTextStatus">
                                 Drag your file(s) here to begin<br> or click to browse
-                            </p>
-                            <p v-if="detectingTextStatus">
-                                Uploading and detecting text in file...
                             </p>
                         </div>
                     </v-card>
@@ -116,26 +113,28 @@ export default {
 <style>
 
 .dropbox {
-  outline: 2px dashed grey; /* the dash box */
+  outline: 2px dashed lightgrey;
   outline-offset: -10px;
   background: lightcyan;
   color: dimgray;
   padding: 10px 10px;
-  min-height: 200px; /* minimum height */
+  min-height: 200px;
   position: relative;
   cursor: pointer;
 }
 
+/* invisible but it's there */
 .input-file {
-  opacity: 0; /* invisible but it's there! */
+  opacity: 0;
   width: 100%;
   height: 200px;
   position: absolute;
   cursor: pointer;
 }
 
+/* when mouse over to the drop zone, change color */
 .dropbox:hover {
-  background: lightblue; /* when mouse over to the drop zone, change color */
+  background: lightblue;
 }
 
 .dropbox p {
@@ -143,7 +142,8 @@ export default {
   text-align: center;
   padding: 50px 0;
 }
-  p {
-      font-size: 18px
-  }
+
+p {
+    font-size: 18px
+}
 </style>

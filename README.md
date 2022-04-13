@@ -10,10 +10,14 @@
 | ![](static/img/images/initial_form_img.png) |
 
 
-| Credit Card Detected Text Screen           |
+| Credit Card Detected Text Success Screen   |
 |:-------------------------------------------|
 | ![](static/img/images/detect_text_img.png) |
 
+
+| Credit Card Detected Text Error Screen           |
+|:-------------------------------------------------|
+| ![](static/img/images/detect_text_error_img.png) |
 
 
 ## Getting Started
