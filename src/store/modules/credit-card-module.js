@@ -1,3 +1,4 @@
+import axios from 'axios'
 import detectTextApi from '../../api/detectTextAPI'
 import detectTextRequestBody from '../../api/models/detectTextModel'
 
@@ -7,12 +8,8 @@ import detectTextFunctions from './detectText'
 const replaceExpiryCardRegex = /[^\d/\///\/]/g
 const trimEmptySpaceRegex = /\s+/g
 
-let initialMessage = {
-    success: false,
-    message: null,
-};
-
 const state = {
+    detectingTextStatus: false,
     selectedImage: null,
     selectedImageBase64: null,
     messageResult: {
@@ -35,6 +32,7 @@ const getters = {
     extractedDetectedText: state => state.extractedDetectedText,
     extractedCardNumber: state => state.extractedCardNumber,
     extractedExpiryDate: state => state.extractedExpiryDate,
+    detectingTextStatus: state => state.detectingTextStatus,
 }
 
 const actions = {
@@ -43,7 +41,10 @@ const actions = {
         commit("resetData")
 
         // init the message to return
-        let msg = initialMessage;
+        let msg = {
+          success: false,
+          message: null,
+        }
 
         // Check if there is a file
         if(!event.target.files) {
@@ -76,27 +77,34 @@ const actions = {
             reader.readAsDataURL(fileObject)
         }
     },
+    async reset({commit}){
+      await commit("resetData")
+    },
     async detectTextFromImage({commit}){
         // init the message to return
-        let msg = initialMessage;
+        let msg = {
+          success: false,
+          message: null,
+        }
 
         // Check if we have an image to detect text
         if(!state.selectedImageBase64) {
             msg.message = "No file was found to detect text operation";
             await commit("addMessage", msg)
         }else{
-            // OCR Google Vision Deetxt Text Request body
-            let detextTextData = detectTextRequestBody.detectTextRequestBody
+            // Change the status to check if it's running a detect-text function
+            commit("setDetectingTextStatus", true)
 
-            this.dispatch('formatDetectedText', detextTextData)
+            // OCR Google Vision Detect Text Request body
+            let detectTextData = detectTextRequestBody.detectTextRequestBody
 
             try {
                 const base64Image = (state.selectedImageBase64).substring((state.selectedImageBase64).indexOf("base64,") + 7);
 
                 // add the base64 image to the request body
-                detextTextData.requests[0].image.content = base64Image;
+                detectTextData.requests[0].image.content = base64Image;
 
-                const response = await detectTextApi.detectTextFromImage(detextTextData)
+                const response = await detectTextApi.detectTextFromImage(detectTextData)
 
                 // get the first index response
                 const detectedTextResponse = response.data.responses[0];
@@ -135,6 +143,8 @@ const actions = {
                         }
                     }
                 }
+                // Change the status to check if it's running a detect-text function
+                commit("setDetectingTextStatus", false)
             } catch (error) {
                 if (error.response.data.error.message) {
                     msg.message = error.response.data.error.message
@@ -144,6 +154,9 @@ const actions = {
 
                 // add the error message
                 await commit("addMessage", msg)
+
+                // Change the status to check if it's running a detect-text function
+                commit("setDetectingTextStatus", false)
             }
         }
     },
@@ -191,9 +204,16 @@ const mutations = {
         state.selectedImageBase64 = base64FileObject
     },
     resetData: function() { // reset the data
-        state.selectedImage = null;
-        state.selectedImageBase64 = null;
-        state.messageResult = initialMessage
+        state.selectedImage = null
+        state.selectedImageBase64 = null
+        state.messageResult = {
+          success: false,
+          message: null,
+        }
+        state.detectingTextStatus = false
+    },
+    setDetectingTextStatus: function(state, status) {
+      state.detectingTextStatus = status
     },
     setDetectTextDescResponse: function(state, textAnnotationsDesc) {
         state.textAnnotationsDesc = textAnnotationsDesc
