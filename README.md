@@ -1,22 +1,22 @@
-# Credit Card OCR
+# Credit Card OCR/Detect Text Example
 
-> Vue2 + Vuetify + google cloud vision api with Progressive Web App
+> Vue2 + Vuetify + Google Cloud vision api as a Progressive Web App
 
 ## Example
 
-![alt tag](http://i.imgur.com/7y6NNJP.png)
+
+|             Initial Form Screen             |    Credit Card Detected Text Screen    |
+|:-------------------------------------------:|:--------------------------------------:|
+| ![](static/img/images/initial_form_img.png) | ![](static/img/images/detect_text_img.png) |
 
 ## Getting Started
 
-> Enable google cloud vision api 
+> Enable Google Cloud Vision api
 
-At -> src/components/Face.vue     [Google cloud api Browser key](https://console.cloud.google.com/apis/dashboard)
+At -> config/dev.env.js and -> config/prod.env.js, Replace 'GOOGLE_API_KEY' with key from [Google Cloud Api Browser Key](https://console.cloud.google.com/apis/dashboard)
 
 ``` bash
-...
- apiKey: "",
-...
-
+ GOOGLE_API_KEY: "Google Cloud Api Browser Key"
 ```
 
 ## Build Setup
