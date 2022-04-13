@@ -15,6 +15,11 @@
 | ![](static/img/images/detect_text_img.png) |
 
 
+| Credit Card Detected Text Success Screen     |
+|:---------------------------------------------|
+| ![](static/img/images/detect_text_img_2.png) |
+
+
 | Credit Card Detected Text Error Screen           |
 |:-------------------------------------------------|
 | ![](static/img/images/detect_text_error_img.png) |
