@@ -5,9 +5,16 @@
 ## Example
 
 
-|             Initial Form Screen             |    Credit Card Detected Text Screen    |
-|:-------------------------------------------:|:--------------------------------------:|
-| ![](static/img/images/initial_form_img.png) | ![](static/img/images/detect_text_img.png) |
+| Initial Form Screen                         |
+|:--------------------------------------------|
+| ![](static/img/images/initial_form_img.png) |
+
+
+| Credit Card Detected Text Screen           |
+|:-------------------------------------------|
+| ![](static/img/images/detect_text_img.png) |
+
+
 
 ## Getting Started
 
