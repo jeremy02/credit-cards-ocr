@@ -7,11 +7,24 @@ let detectTextRequestBody = { // OCR request
             },
             "features": [
                 {
-                "type":"TEXT_DETECTION" // DOCUMENT_TEXT_DETECTION
-                }
+                    "maxResults": 50,
+                    "model": "builtin/latest",
+                    "type": "TEXT_DETECTION" // DOCUMENT_TEXT_DETECTION
+                },
+                {
+                    "maxResults": 50,
+                    "type": "LOGO_DETECTION"
+                },
             ],
             "imageContext": {
-            "languageHints": ["en"]
+                // "languageHints": ["en"],
+                "cropHintsParams": {
+                    "aspectRatios": [
+                        0.8,
+                        1,
+                        1.2
+                    ]
+                }
             }
         }
     ]

@@ -29,17 +29,6 @@
 
 
                     <v-layout row wrap xs12 sm12 md6 lg6 xl6>
-
-                        <!--Detect Text Button-->
-                        <v-flex xs12 sm12 md6 lg6 xl6>
-                            <v-btn @click.native="detectTextFromImage" class="ma-2 white--text green" :disabled="!selectedImageBase64 && !detectingTextStatus">
-                                <v-icon left dark mr-2>
-                                  camera_alt
-                                </v-icon>
-                                Detect Text
-                            </v-btn>
-                        </v-flex>
-
                         <!--Reset Button -->
                         <v-flex xs12 sm12 md6 lg6 xl6>
                             <v-btn class="ma-2 white--text orange" @click.native="reset" :disabled="!selectedImageBase64">
@@ -51,6 +40,15 @@
 
                         </v-flex>
 
+                        <!--Detect Text Button-->
+                        <v-flex xs12 sm12 md6 lg6 xl6>
+                            <v-btn @click.native="detectTextFromImage" class="ma-2 white--text green" :disabled="!selectedImageBase64 && !detectingTextStatus">
+                                <v-icon left dark mr-2>
+                                  camera_alt
+                                </v-icon>
+                                Detect Text
+                            </v-btn>
+                        </v-flex>
                     </v-layout>
                 </v-flex>
 
@@ -60,9 +58,7 @@
                     <div class="text-xs-center" v-show="detectingTextStatus">
                         <v-progress-circular indeterminate v-bind:size="100" v-bind:width="3" class="teal--text"></v-progress-circular>
                     </div>
-                    <div v-show="textAnnotationsDesc || fullTextAnnotationsDesc || extractedDetectedText || extractedCardNumber || extractedExpiryDate" class="text-md-center">
-                        <p v-show="textAnnotationsDesc">Extracted Text: <span class="blue--text">{{ textAnnotationsDesc }}</span></p>
-                        <p v-show="fullTextAnnotationsDesc">Full Text: <span class="red--text">{{ fullTextAnnotationsDesc }}</span></p>
+                    <div v-show="extractedDetectedText || extractedCardNumber || extractedExpiryDate" class="text-md-center">
                         <p v-show="extractedDetectedText">Text Detected: <span class="red--text">{{ extractedDetectedText }}</span></p>
                         <p v-show="extractedCardNumber">Card Number Detected: <span class="red--text">{{ extractedCardNumber }}</span></p>
                         <p v-show="extractedExpiryDate">Card Expiry Date Detected: <span class="red--text">{{ extractedExpiryDate }}</span></p>
