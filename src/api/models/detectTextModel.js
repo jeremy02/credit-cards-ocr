@@ -11,10 +11,6 @@ let detectTextRequestBody = { // OCR request
                     "model": "builtin/latest",
                     "type": "TEXT_DETECTION" // DOCUMENT_TEXT_DETECTION
                 },
-                {
-                    "maxResults": 50,
-                    "type": "LOGO_DETECTION"
-                },
             ],
             "imageContext": {
                 // "languageHints": ["en"],

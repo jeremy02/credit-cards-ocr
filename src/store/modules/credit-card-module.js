@@ -134,9 +134,6 @@ const actions = {
                     // commit("setDetectTextDescResponse", textAnnotationsDesc)
                     // commit("setDetectTextFullDescResponse", fullTextAnnotationsDesc)
 
-                    console.log("textAnnotations:::", JSON.stringify(detectedTextResponse.logoAnnotations))
-
-
                     // just do operations on one of the above results
                     // format the text to extract details
                     if(fullTextAnnotationsDesc) {
