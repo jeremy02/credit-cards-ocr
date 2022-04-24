@@ -102,9 +102,12 @@ const actions = {
                 const base64Image = (state.selectedImageBase64).substring((state.selectedImageBase64).indexOf("base64,") + 7);
 
                 // const testData = [ "http://www.8008205555.com", "A (Domestic) 400 820 5555", "S (Overseas) +86 400 820 5555", "888883600000", "GSC 0120154937-HiCo-di", "CHINA MERCHANTS BANE", "**A AUTHORIZED SIGNATURE", "AK Unto", "nionPay", "RUnionPay", "onPay R UnionPay R", "UnionPay R Unio", "UnionPay", "4225 467", "ior", "ay REE", "UnionPay R", "oionPay RE", "onPay RUnionPay", "anPay R Un", "Pay", "UnionPay R", "****** NOT VALID UNLESS SIGNED", "UnionPay K UnionPay EDY", "6225 7688 1652 4225", "CREDIT", "MONTH/YEAR", "GOLD", "VALID", "THRU 10/29", "JIA JUNFANG", "UnionPay", "" ]
-                //
-                // await this.dispatch('formatDetectedText', testData)
 
+                const testData = [ "交通銀行", "太平洋卡 PACIFIC CARD", "UnionPay", "银联", "++YOUTH ΞΕ", "4581 2309 1531 6364", "4581", "MONTH/YEAR", "VALID 10/25", "CREDIT CARD", "THRU", "HANG BAI TONG", "VISA" ]
+
+                await this.dispatch('formatDetectedText', testData)
+
+                /*
                 // add the base64 image to the request body
                 detectTextData.requests[0].image.content = base64Image;
 
@@ -137,16 +140,18 @@ const actions = {
                     // just do operations on one of the above results
                     // format the text to extract details
                     if(fullTextAnnotationsDesc) {
-                       this.dispatch('formatDetectedText', fullTextAnnotationsDesc);
+                       this.dispatch('formatDetectedText', fullTextAnnotationsDesc)
+
                     }else{
                         if(textAnnotationsDesc) {
-                            this.dispatch('formatDetectedText', textAnnotationsDesc);
+                            this.dispatch('formatDetectedText', textAnnotationsDesc)
                         }else{
                             msg.message = "No text was detected from the image to perform operation";
                             commit("addMessage", msg)
                         }
                     }
                 }
+                */
                 // Change the status to check if it's running a detect-text function
                 commit("setDetectingTextStatus", false)
             } catch (error) {
@@ -171,7 +176,7 @@ const actions = {
         let detectedText = notFormattedDetectedText
 
         // we are testing
-        if(1 === 1) {
+        if(1 === 2) {
             detectedText = notFormattedDetectedText.replace(/\r\n/g, "\r").replace(/\n/g, "\r").split(/\r/)
             commit("setDetectedText", notFormattedDetectedText.replace(/\r\n/g, "\r").replace(/\n/g, "\r").split(/\r/))  // the detected text
         }else{

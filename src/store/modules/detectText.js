@@ -1,6 +1,8 @@
 // store the regexes here
-const numberWithSpacesRegex = /\b(\s*[0-9]+\s*)\b/
-const numberWithSpacesRegex_version_2 = /\b(?:\d{4}[ -]?){3}(?=\d{4}\b)/gm
+const numberWithSpacesRegex_version_1 = /\b(?:\d{4}[ -]?){3}(?=\d{4}\b)/gm
+const numberWithSpacesRegex_version_2 = /\b(\s*[0-9]+\s*)\b/
+const numberWithSpacesRegexMatch_version_1 = /\\b(\\d{4}[- ]?){4}/
+const numberWithSpacesRegexMatch_version_2 = /\b(\d{4}[- ]?){4}/
 
 const replaceExpiryCardRegex = /[^\d/\///\/]/g
 const trimEmptySpaceRegex = /\s+/g
@@ -28,31 +30,35 @@ function getCardNumberFromDetectedText (detectedText) {
 
         // to check if string contains digits with spaces but 12 characters or more
         if(element.length >= 12) {
+            // calculation using ratio // this will minimise the number of elements we will have to loop through
+            let cardNumberResRatio = checkForPossibleCardNumberUsingRatio(element)
 
-            // calculation using regex
-            let cardNumberRes = checkForPossibleCardNumberUsingRegex(element)
+            // has the element met the ratio criteria
+            if(cardNumberResRatio != -1) {
+                // calculation using first regex test
+                let cardNumberResTestReg1 = checkForPossibleCardNumberUsingRegex(element, numberWithSpacesRegex_version_1, false)
 
-            // working code for test
-            if(numberWithSpacesRegex_version_2.test(element)) {
-                console.log("numberWithSpacesRegex_version_2 yes::"+element)
-            }else{
-                console.log("numberWithSpacesRegex_version_2 no:::"+ element)
+                // calculation using second regex test
+                let cardNumberResTestReg2 = checkForPossibleCardNumberUsingRegex(element, numberWithSpacesRegex_version_2, false)
+
+                try {
+                    // calculation using first regex match
+                    let cardNumberResMatchReg1 = checkForPossibleCardNumberUsingRegex(element, numberWithSpacesRegexMatch_version_1, false)
+
+                    // calculation using second regex match
+                    let cardNumberResMatchReg2 = checkForPossibleCardNumberUsingRegex(element, numberWithSpacesRegexMatch_version_2, false)
+
+
+                    console.log("cardNumberResMatchReg1 no:::"+ cardNumberResMatchReg1+"")
+
+                    console.log("cardNumberResMatchReg2 no:::"+ cardNumberResMatchReg2+"")
+
+                } catch(e){
+                    // an exception doing the match for the elements
+                    result = -1
+                }
+
             }
-
-            // // calculation using ratio
-            // let cardNumberResRatio = checkForPossibleCardNumberUsingRatio(element)
-            //
-            // if(cardNumberRes !=-1 && cardNumberResRatio != -1) {
-            //     result = index
-            //     return result
-            //     break
-            // }else{
-            //     if(cardNumberResRatio != -1) {
-            //         result = index
-            //         return result
-            //         break
-            //     }
-            // }
         }
     }
     return result
@@ -100,10 +106,16 @@ function getExpiryDateFromDetectedText (detectedText) {
 
 // Check if the string passed is a possible Credit Number
 // Using Regular Expressions
-function checkForPossibleCardNumberUsingRegex(str) {
+function checkForPossibleCardNumberUsingRegex(str, cardNumberRegex, isMatch) {
     let result = -1
-    if(numberWithSpacesRegex.test(str)) {
-        result = str
+    if(isMatch) {
+        if(str.match(cardNumberRegex)) {
+            result = str
+        }
+    } else {
+        if(cardNumberRegex.test(str)) {
+            result = str
+        }
     }
 
     return result
@@ -119,19 +131,19 @@ function checkForPossibleCardNumberUsingRatio(str) {
 
     let numbersRatio = (findTotalCount(trimmedString) / trimmedString.length) * 100
 
-    if(parseFloat(numbersRatio) > parseFloat(90.0)) {
+    if(parseFloat(numbersRatio) > parseFloat(80.0)) {
         result = str
     }
     return result
 }
 
 function findTotalCount(str) {
-  let digitsArr = str.match(/\d+/g)
-  // let digitsArr = str.replace(/[^0-9]/g, '').length;
-  if (digitsArr) {
-    return digitsArr.join("").length
-  }
-  return 0
+    let digitsArr = str.match(/\d+/g)
+    // let digitsArr = str.replace(/[^0-9]/g, '').length;
+    if (digitsArr) {
+        return digitsArr.join("").length
+    }
+    return 0
 }
 
 export default {
