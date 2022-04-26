@@ -34,30 +34,41 @@ function getCardNumberFromDetectedText (detectedText) {
             let cardNumberResRatio = checkForPossibleCardNumberUsingRatio(element)
 
             // has the element met the ratio criteria
-            if(cardNumberResRatio != -1) {
-                // calculation using first regex test
-                let cardNumberResTestReg1 = checkForPossibleCardNumberUsingRegex(element, numberWithSpacesRegex_version_1, false)
-
-                // calculation using second regex test
-                let cardNumberResTestReg2 = checkForPossibleCardNumberUsingRegex(element, numberWithSpacesRegex_version_2, false)
-
+            if(cardNumberResRatio && cardNumberResRatio != -1) {
                 try {
-                    // calculation using first regex match
-                    let cardNumberResMatchReg1 = checkForPossibleCardNumberUsingRegex(element, numberWithSpacesRegexMatch_version_1, false)
+                    // calculation using first regex test
+                    let cardNumberResTestReg1 = checkForPossibleCardNumberUsingRegex(element, numberWithSpacesRegex_version_1, false)
 
-                    // calculation using second regex match
-                    let cardNumberResMatchReg2 = checkForPossibleCardNumberUsingRegex(element, numberWithSpacesRegexMatch_version_2, false)
+                    // working code for check credit card numbers using regex test 1
+                    if(cardNumberResTestReg1 &&  cardNumberResTestReg1 != -1) {
+                        result = index
+                        return result
+                        break
+                    }else{
+                        // calculation using first regex match
+                        let cardNumberResMatchReg1 = checkForPossibleCardNumberUsingRegex(element, numberWithSpacesRegexMatch_version_1, false)
 
+                        // calculation using second regex match
+                        let cardNumberResMatchReg2 = checkForPossibleCardNumberUsingRegex(element, numberWithSpacesRegexMatch_version_2, false)
 
-                    console.log("cardNumberResMatchReg1 no:::"+ cardNumberResMatchReg1+"")
-
-                    console.log("cardNumberResMatchReg2 no:::"+ cardNumberResMatchReg2+"")
-
+                        if((cardNumberResMatchReg1 &&  cardNumberResMatchReg1 != -1) || (cardNumberResMatchReg2 &&  cardNumberResMatchReg2 != -1)) {
+                            result = index
+                            return result
+                            break
+                        }else{
+                            // working code for check credit card numbers using regex test 2
+                            let cardNumberResTestReg2 = checkForPossibleCardNumberUsingRegex(element, numberWithSpacesRegex_version_2, false)
+                            if(cardNumberResTestReg2 &&  cardNumberResTestReg2 != -1) {
+                                result = index
+                                return result
+                                break
+                            }
+                        }
+                    }
                 } catch(e){
                     // an exception doing the match for the elements
                     result = -1
                 }
-
             }
         }
     }

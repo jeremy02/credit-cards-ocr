@@ -101,12 +101,6 @@ const actions = {
             try {
                 const base64Image = (state.selectedImageBase64).substring((state.selectedImageBase64).indexOf("base64,") + 7);
 
-                // const testData = [ "http://www.8008205555.com", "A (Domestic) 400 820 5555", "S (Overseas) +86 400 820 5555", "888883600000", "GSC 0120154937-HiCo-di", "CHINA MERCHANTS BANE", "**A AUTHORIZED SIGNATURE", "AK Unto", "nionPay", "RUnionPay", "onPay R UnionPay R", "UnionPay R Unio", "UnionPay", "4225 467", "ior", "ay REE", "UnionPay R", "oionPay RE", "onPay RUnionPay", "anPay R Un", "Pay", "UnionPay R", "****** NOT VALID UNLESS SIGNED", "UnionPay K UnionPay EDY", "6225 7688 1652 4225", "CREDIT", "MONTH/YEAR", "GOLD", "VALID", "THRU 10/29", "JIA JUNFANG", "UnionPay", "" ]
-
-                const testData = [ "交通銀行", "太平洋卡 PACIFIC CARD", "UnionPay", "银联", "++YOUTH ΞΕ", "4581 2309 1531 6364", "4581", "MONTH/YEAR", "VALID 10/25", "CREDIT CARD", "THRU", "HANG BAI TONG", "VISA" ]
-
-                await this.dispatch('formatDetectedText', testData)
-
                 /*
                 // add the base64 image to the request body
                 detectTextData.requests[0].image.content = base64Image;
