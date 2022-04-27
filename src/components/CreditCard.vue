@@ -19,7 +19,7 @@
 
                     <v-card  v-if="!selectedImageBase64 && !detectingTextStatus">
                         <div class="dropbox">
-                            <input type="file" :disabled="detectingTextStatus" @change="handleImage($event)"
+                            <input type="file" :disabled="detectingTextStatus" @change="handleImageSelect($event)"
                                    block accept="image/x-png,image/gif,image/jpeg,image/jpg" class="input-file">
                             <p v-if="!detectingTextStatus">
                                 Drag your file(s) here to begin<br> or click to browse
@@ -75,8 +75,6 @@
 
 import {mapGetters, mapActions} from "vuex";
 
-import * as creditCardsDetectText from "credit-cards-detect-text"
-
 export default {
     name: 'CreditCard',
     data: function() {
@@ -99,19 +97,6 @@ export default {
     },
     methods: {
         ...mapActions(["handleImageSelect", "detectTextFromImage", "reset"]),
-        handleImage: function(event) {
-
-            const selectedImage = event
-
-            creditCardsDetectText.setAPISecret("")
-
-            creditCardsDetectText.getCardDetails(selectedImage)
-                .then(response => {
-                    console.log("response", JSON.stringify(response))
-                }).catch((err) => {
-                console.log(err)
-            })
-        }
     },
     mounted() {
       this.reset();
