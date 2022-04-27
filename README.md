@@ -27,7 +27,16 @@
 
 ## Getting Started
 
-> Enable Google Cloud Vision api
+#### Create the Google API Key
+
+Follow the instructions on how to create Google API Key for your project(https://cloud.google.com/docs/authentication/api-keys). This will
+help in authenticating your requests.
+
+Please make sure to copy your key and keep it secure.
+
+##### Enable Google Cloud Vision api
+
+> You must enable the Vision API for your project. For more information on enabling APIs, see the [Service Usage documentation](https://cloud.google.com/service-usage/docs/enable-disable).
 
 At -> config/dev.env.js and -> config/prod.env.js, Replace 'GOOGLE_API_KEY' with key from [Google Cloud Api Browser Key](https://console.cloud.google.com/apis/dashboard)
 

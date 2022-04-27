@@ -101,7 +101,6 @@ const actions = {
             try {
                 const base64Image = (state.selectedImageBase64).substring((state.selectedImageBase64).indexOf("base64,") + 7);
 
-                /*
                 // add the base64 image to the request body
                 detectTextData.requests[0].image.content = base64Image;
 
@@ -145,7 +144,7 @@ const actions = {
                         }
                     }
                 }
-                */
+
                 // Change the status to check if it's running a detect-text function
                 commit("setDetectingTextStatus", false)
             } catch (error) {
@@ -167,15 +166,8 @@ const actions = {
         let extractedCardNumber = null
         let extractedExpiryDate = null
 
-        let detectedText = notFormattedDetectedText
-
-        // we are testing
-        if(1 === 2) {
-            detectedText = notFormattedDetectedText.replace(/\r\n/g, "\r").replace(/\n/g, "\r").split(/\r/)
-            commit("setDetectedText", notFormattedDetectedText.replace(/\r\n/g, "\r").replace(/\n/g, "\r").split(/\r/))  // the detected text
-        }else{
-            commit("setDetectedText", notFormattedDetectedText)  // the detected text
-        }
+        let detectedText = notFormattedDetectedText.replace(/\r\n/g, "\r").replace(/\n/g, "\r").split(/\r/)
+        commit("setDetectedText", notFormattedDetectedText.replace(/\r\n/g, "\r").replace(/\n/g, "\r").split(/\r/))  // the detected text
 
         // get the card number
         let cardNumberIndex = detectTextFunctions.getCardNumberFromDetectedText(detectedText)
